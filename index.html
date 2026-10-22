@@ -1,0 +1,1041 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SpeakFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&amp;family=DM+Sans:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+/*
+1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
+2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
+*/
+
+*,
+::before,
+::after {
+  box-sizing: border-box; /* 1 */
+  border-width: 0; /* 2 */
+  border-style: solid; /* 2 */
+  border-color: theme('borderColor.DEFAULT', currentColor); /* 2 */
+}
+
+::before,
+::after {
+  --tw-content: '';
+}
+
+/*
+1. Use a consistent sensible line-height in all browsers.
+2. Prevent adjustments of font size after orientation changes in iOS.
+3. Use a more readable tab size.
+4. Use the user's configured `sans` font-family by default.
+5. Use the user's configured `sans` font-feature-settings by default.
+6. Use the user's configured `sans` font-variation-settings by default.
+7. Disable tap highlights on iOS
+*/
+
+html,
+:host {
+  line-height: 1.5; /* 1 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+  -moz-tab-size: 4; /* 3 */
+  tab-size: 4; /* 3 */
+  font-family: theme('fontFamily.sans', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"); /* 4 */
+  font-feature-settings: theme('fontFamily.sans[1].fontFeatureSettings', normal); /* 5 */
+  font-variation-settings: theme('fontFamily.sans[1].fontVariationSettings', normal); /* 6 */
+  -webkit-tap-highlight-color: transparent; /* 7 */
+}
+
+/*
+1. Remove the margin in all browsers.
+2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
+*/
+
+body {
+  margin: 0; /* 1 */
+  line-height: inherit; /* 2 */
+}
+
+/*
+1. Add the correct height in Firefox.
+2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
+3. Ensure horizontal rules are visible by default.
+*/
+
+hr {
+  height: 0; /* 1 */
+  color: inherit; /* 2 */
+  border-top-width: 1px; /* 3 */
+}
+
+/*
+Add the correct text decoration in Chrome, Edge, and Safari.
+*/
+
+abbr:where([title]) {
+  text-decoration: underline dotted;
+}
+
+/*
+Remove the default font size and weight for headings.
+*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/*
+Reset links to optimize for opt-in styling instead of opt-out.
+*/
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+/*
+Add the correct font weight in Edge and Safari.
+*/
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+/*
+1. Use the user's configured `mono` font-family by default.
+2. Use the user's configured `mono` font-feature-settings by default.
+3. Use the user's configured `mono` font-variation-settings by default.
+4. Correct the odd `em` font sizing in all browsers.
+*/
+
+code,
+kbd,
+samp,
+pre {
+  font-family: theme('fontFamily.mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace); /* 1 */
+  font-feature-settings: theme('fontFamily.mono[1].fontFeatureSettings', normal); /* 2 */
+  font-variation-settings: theme('fontFamily.mono[1].fontVariationSettings', normal); /* 3 */
+  font-size: 1em; /* 4 */
+}
+
+/*
+Add the correct font size in all browsers.
+*/
+
+small {
+  font-size: 80%;
+}
+
+/*
+Prevent `sub` and `sup` elements from affecting the line height in all browsers.
+*/
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/*
+1. Remove text indentation from table contents in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=999088, https://bugs.webkit.org/show_bug.cgi?id=201297)
+2. Correct table border color inheritance in all Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=935729, https://bugs.webkit.org/show_bug.cgi?id=195016)
+3. Remove gaps between table borders by default.
+*/
+
+table {
+  text-indent: 0; /* 1 */
+  border-color: inherit; /* 2 */
+  border-collapse: collapse; /* 3 */
+}
+
+/*
+1. Change the font styles in all browsers.
+2. Remove the margin in Firefox and Safari.
+3. Remove default padding in all browsers.
+*/
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit; /* 1 */
+  font-feature-settings: inherit; /* 1 */
+  font-variation-settings: inherit; /* 1 */
+  font-size: 100%; /* 1 */
+  font-weight: inherit; /* 1 */
+  line-height: inherit; /* 1 */
+  letter-spacing: inherit; /* 1 */
+  color: inherit; /* 1 */
+  margin: 0; /* 2 */
+  padding: 0; /* 3 */
+}
+
+/*
+Remove the inheritance of text transform in Edge and Firefox.
+*/
+
+button,
+select {
+  text-transform: none;
+}
+
+/*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Remove default button styles.
+*/
+
+button,
+input:where([type='button']),
+input:where([type='reset']),
+input:where([type='submit']) {
+  -webkit-appearance: button; /* 1 */
+  background-color: transparent; /* 2 */
+  background-image: none; /* 2 */
+}
+
+/*
+Use the modern Firefox focus style for all focusable elements.
+*/
+
+:-moz-focusring {
+  outline: auto;
+}
+
+/*
+Remove the additional `:invalid` styles in Firefox. (https://github.com/mozilla/gecko-dev/blob/2f9eacd9d3d995c937b4251a5557d95d494c9be1/layout/style/res/forms.css#L728-L737)
+*/
+
+:-moz-ui-invalid {
+  box-shadow: none;
+}
+
+/*
+Add the correct vertical alignment in Chrome and Firefox.
+*/
+
+progress {
+  vertical-align: baseline;
+}
+
+/*
+Correct the cursor style of increment and decrement buttons in Safari.
+*/
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/*
+1. Correct the odd appearance in Chrome and Safari.
+2. Correct the outline style in Safari.
+*/
+
+[type='search'] {
+  -webkit-appearance: textfield; /* 1 */
+  outline-offset: -2px; /* 2 */
+}
+
+/*
+Remove the inner padding in Chrome and Safari on macOS.
+*/
+
+::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Change font properties to `inherit` in Safari.
+*/
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button; /* 1 */
+  font: inherit; /* 2 */
+}
+
+/*
+Add the correct display in Chrome and Safari.
+*/
+
+summary {
+  display: list-item;
+}
+
+/*
+Removes the default spacing and border for appropriate elements.
+*/
+
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
+  margin: 0;
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+ol,
+ul,
+menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+Reset default styling for dialogs.
+*/
+dialog {
+  padding: 0;
+}
+
+/*
+Prevent resizing textareas horizontally by default.
+*/
+
+textarea {
+  resize: vertical;
+}
+
+/*
+1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
+2. Set the default placeholder color to the user's configured gray 400 color.
+*/
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 1; /* 1 */
+  color: theme('colors.gray.400', #9ca3af); /* 2 */
+}
+
+/*
+Set the default cursor for buttons.
+*/
+
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+/*
+Make sure disabled buttons don't get the pointer cursor.
+*/
+:disabled {
+  cursor: default;
+}
+
+/*
+1. Make replaced elements `display: block` by default. (https://github.com/mozdevs/cssremedy/issues/14)
+2. Add `vertical-align: middle` to align replaced elements more sensibly by default. (https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210)
+   This can trigger a poorly considered lint error in some tools but is included by design.
+*/
+
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: block; /* 1 */
+  vertical-align: middle; /* 2 */
+}
+
+/*
+Constrain images and videos to the parent width and preserve their intrinsic aspect ratio. (https://github.com/mozdevs/cssremedy/issues/14)
+*/
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Make elements with the HTML hidden attribute stay hidden by default */
+[hidden]:where(:not([hidden="until-found"])) {
+  display: none;
+}
+
+</style>
+  <style>
+.w-full{width:100%}
+:root{--navy:#0F3666;--yellow:#F4C542;--soft:#EAF0F7;--warm:#FFF8D9;--line:#DCE6F0;--muted:#4E6682}
+*{box-sizing:border-box}body{margin:0;width:100%;font-family:Vazirmatn,sans-serif;color:var(--navy);background:white}
+button,input,select{font:inherit}button{cursor:pointer}button,a,input,select{outline-offset:4px} :focus-visible{outline:3px solid var(--yellow)}
+button{border:0}h1,h2,h3,p{margin:0}h1{line-height:1.4;font-weight:800}h2,h3{line-height:1.6;font-weight:700}p{line-height:1.9}small{line-height:1.7}
+.app-wrapper{width:100%;min-height:calc(100 * min(var(--vh,1vh),1vh));padding-bottom:96px}
+.shell{width:100%;max-width:1200px;margin:auto;padding-inline:24px}
+.header{background:var(--navy);color:white;position:sticky;top:0;z-index:30;width:100%}
+.header-grid{height:76px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:20px;align-items:center}
+.brand{background:none;color:inherit;display:flex;align-items:center;gap:10px;direction:ltr;white-space:nowrap}
+.brand-symbol{width:36px;height:36px;display:grid;place-items:center;background:var(--yellow);color:var(--navy);border-radius:13px;flex:none}
+.brand-name{font-family:"DM Sans";font-weight:700}.brand-caption{display:block;direction:rtl;font-size:10px}
+.nav{display:flex;justify-content:center;gap:4px}.nav button{background:transparent;color:white;border-radius:10px;padding:10px 8px;min-height:44px}
+.nav button:hover,.nav button[aria-current=page]{background:#FFFFFF1F}
+.header-actions{display:flex;align-items:center;gap:8px}.menu-toggle{display:none}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:44px;padding:10px 16px;border-radius:12px;font-weight:700;line-height:1.6;white-space:normal;background:var(--yellow);color:var(--navy)}
+.btn:hover{filter:brightness(.97)}.secondary{background:white;border:1px solid var(--navy)}.quiet{background:var(--soft)}.icon-button{padding:10px;min-width:44px}
+main{padding-top:28px}.view[hidden]{display:none}.view{animation:appear .25s ease}
+@keyframes appear{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.view-head{display:grid;gap:8px;margin-bottom:24px}.lead{color:var(--muted);max-width:740px}
+.section{margin-top:28px}.section-head{display:grid;gap:8px;margin-bottom:16px}
+.grid-2,.grid-3,.grid-4{display:grid;gap:16px;align-items:stretch}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:white;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 8px 24px #0F36660D;min-width:0;display:flex;flex-direction:column;gap:12px}
+.dark{background:var(--navy);color:white;border-color:var(--navy)}.card .btn:last-child{align-self:flex-start;margin-top:auto}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;padding-block:12px 24px}
+.hero-copy{display:grid;gap:16px}.hero-copy h1{max-width:650px}.hero-copy .actions{margin:0}
+.stage{height:350px;background:var(--navy);border-radius:28px;position:relative;overflow:hidden;padding:24px;display:grid;place-items:center}
+.orb{width:155px;height:155px;border-radius:48%;background:var(--yellow);display:grid;place-items:center;box-shadow:0 0 0 14px #FFFFFF13}
+.face{width:92px;height:72px;background:white;border-radius:46%;position:relative}.face:before{content:"";position:absolute;left:22px;top:25px;width:9px;height:9px;background:var(--navy);border-radius:50%;box-shadow:39px 0 var(--navy)}.face:after{content:"";position:absolute;bottom:17px;left:32px;width:28px;height:13px;border-bottom:3px solid var(--navy);border-radius:50%}
+.stage-label{position:absolute;top:20px;right:20px;background:white;border-radius:12px;padding:10px;max-width:calc(100% - 40px);direction:ltr;font-family:"DM Sans";font-size:12px}.stage .btn{position:absolute;bottom:20px;left:20px}
+.tag{display:inline-flex;align-self:flex-start;padding:5px 10px;border-radius:999px;background:var(--warm);color:var(--navy);font-size:12px}
+.avatar{width:56px;height:56px;background:var(--navy);color:var(--yellow);border-radius:20px;display:grid;place-items:center;font-family:"DM Sans";font-size:24px;flex:none}
+.partner-top{display:flex;justify-content:space-between;gap:12px;align-items:center}.partner-top h2{font-family:"DM Sans"}
+.english{direction:ltr;unicode-bidi:isolate;font-family:"DM Sans";overflow-wrap:anywhere}.metric{font-family:"DM Sans";font-size:28px;font-weight:700;direction:ltr;text-align:right}
+.cycle{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.cycle span{background:white;color:var(--navy);text-align:center;padding:12px 6px;border-radius:12px;font-family:"DM Sans"}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center}.input{width:100%;min-width:0;border:1px solid var(--line);border-radius:12px;padding:11px;background:white;color:var(--navy)}.search-field{flex:1 1 250px}.search-field label{display:block;margin-bottom:6px;font-size:13px}
+.filter{background:white;border:1px solid var(--line);border-radius:999px;padding:10px 13px;min-height:44px;color:var(--navy)}.filter[aria-pressed=true]{background:var(--navy);color:white}
+.room{display:grid;grid-template-columns:240px minmax(0,1fr);gap:16px}.bubble{padding:14px;border-radius:15px;background:var(--soft);direction:ltr;font-family:"DM Sans";line-height:1.8}.bubble.ai{background:var(--navy);color:white}
+.notice{padding:12px 16px;border-radius:12px;background:var(--warm);color:var(--navy);line-height:1.8;font-size:13px}
+.field{display:grid;gap:8px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.teacher-photo{width:100%;height:180px;object-fit:cover;border-radius:12px}
+.map{position:fixed;bottom:18px;left:18px;z-index:40}.map-panel{position:absolute;bottom:56px;left:0;width:min(300px,calc(100vw - 36px));max-height:360px;overflow:auto;padding:8px;border:1px solid var(--line);border-radius:16px;background:white;box-shadow:0 12px 32px #0F366622}.map-panel button{display:block;width:100%;text-align:right;background:white;color:var(--navy);padding:10px;border-radius:8px;min-height:44px}.map-panel button:hover{background:var(--warm)}
+.bottom-nav{display:none}.narrow{max-width:560px;margin-inline:auto}.price{font-weight:800}.plan-list{padding-right:20px;line-height:2}.check-field{display:flex;align-items:center;gap:8px}.check-field input{width:18px;height:18px;accent-color:var(--navy)}
+[hidden]{display:none!important}svg{width:20px;height:20px;flex:none}
+@media(min-width:1021px){.hero h1{font-size:48px}}
+@media(max-width:1020px){.header-grid{height:68px;grid-template-columns:minmax(0,1fr) auto;gap:12px}.menu-toggle{display:inline-flex}.nav{display:none;position:absolute;top:68px;right:0;width:100%;padding:12px 24px;background:var(--navy);grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #FFFFFF30}.nav.open{display:grid}.grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1fr 1fr}.bottom-nav{display:grid;position:fixed;bottom:0;width:100%;grid-template-columns:repeat(4,minmax(0,1fr));background:white;border-top:1px solid var(--line);z-index:35;padding:6px 8px calc(6px + env(safe-area-inset-bottom))}.bottom-nav button{min-height:48px;background:white;color:var(--navy);font-size:12px}.map{bottom:82px}.app-wrapper{padding-bottom:150px}}
+@media(max-width:700px){.shell{padding-inline:16px}main{padding-top:20px}.hero,.grid-2,.grid-3,.room{grid-template-columns:1fr}.hero{gap:20px}.stage{height:290px}.card{padding:18px}.section{margin-top:24px}.cycle{grid-template-columns:repeat(3,minmax(0,1fr))}.brand-caption{display:none}.header-actions>.profile-link{display:none}.header-actions{gap:6px}.header-actions>.btn{padding:9px 11px}.nav{padding-inline:16px;grid-template-columns:repeat(2,minmax(0,1fr))}.actions>.btn{flex:1 1 140px}.room aside{flex-direction:row;align-items:center}.metric{font-size:26px}}
+@media(max-width:420px){.grid-4{grid-template-columns:1fr}.brand{gap:7px}.brand-symbol{width:30px;height:30px}.header-grid{gap:8px}.header-actions>.btn{padding:8px}.card .btn{max-width:100%}}
+@media(prefers-reduced-motion:reduce){.view{animation:none}}
+
+</style>
+  
+  
+  
+  
+  
+   
+  <script>
+document.addEventListener('DOMContentLoaded',()=>{
+if (window.lucide) window.lucide.createIcons();
+const $=id=>document.getElementById(id);
+let running=false,elapsed=0,start=0,tick=null;
+function paintTimer(){const seconds=Math.floor((elapsed+(running?Date.now()-start:0))/1000);$('timer').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');}
+function stopTimer(){if(running){elapsed+=Date.now()-start;running=false;clearInterval(tick);} $('startState').hidden=false;$('pauseState').hidden=true;paintTimer();}
+function go(id){if(!$(id)||!$(id).classList.contains('view'))return;stopTimer();document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!==id);document.querySelectorAll('[data-go]').forEach(b=>{if(b.dataset.go===id)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});$('mainNav').classList.remove('open');$('menuToggle').setAttribute('aria-expanded','false');$('mapPanel').hidden=true;$('mapToggle').setAttribute('aria-expanded','false');window.scrollTo({top:0,behavior:'instant'});}
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+$('menuToggle').addEventListener('click',()=>{$('menuToggle').setAttribute('aria-expanded',String($('mainNav').classList.toggle('open')));});
+$('mapToggle').addEventListener('click',()=>{$('mapPanel').hidden=!$('mapPanel').hidden;$('mapToggle').setAttribute('aria-expanded',String(!$('mapPanel').hidden));});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('mapPanel').hidden=true;$('mapToggle').setAttribute('aria-expanded','false');$('mainNav').classList.remove('open');$('menuToggle').setAttribute('aria-expanded','false');}});
+const partners={Alex:['A','Friendly Friend · B1'],Emma:['E','Travel Partner · A2–B1'],Daniel:['D','Job Interviewer · B1–B2'],Mia:['M','English Teacher · A2–B2']};
+document.querySelectorAll('[data-select]').forEach(b=>b.addEventListener('click',()=>{const name=b.dataset.select;$('practiceName').textContent=name;$('practiceAvatar').textContent=partners[name][0];$('practiceRole').textContent=partners[name][1];go('practice');}));
+let topic='all';
+function filterPartners(){const term=$('partnerSearch').value.trim().toLowerCase();let count=0;document.querySelectorAll('#partnerList article').forEach(card=>{card.hidden=!(card.dataset.search.includes(term)&&(topic==='all'||card.dataset.category===topic));if(!card.hidden)count++;});$('partnerEmpty').hidden=count>0;}
+$('partnerSearch').addEventListener('input',filterPartners);
+document.querySelectorAll('[data-topic]').forEach(b=>b.addEventListener('click',()=>{topic=b.dataset.topic;document.querySelectorAll('[data-topic]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));filterPartners();}));
+function setupSearch(input,list,empty){$(input).addEventListener('input',()=>{let count=0;const term=$(input).value.trim().toLowerCase();document.querySelectorAll('#'+list+' article').forEach(card=>{card.hidden=!card.dataset.search.includes(term);if(!card.hidden)count++;});$(empty).hidden=count>0;});}
+setupSearch('courseSearch','courseList','courseEmpty');setupSearch('contentSearch','contentList','contentEmpty');
+document.querySelectorAll('[data-course]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-course-panel]').forEach(p=>p.hidden=p.dataset.coursePanel!==b.dataset.course);go('course-detail');}));
+$('timerToggle').addEventListener('click',()=>{if(running)stopTimer();else{running=true;start=Date.now();$('startState').hidden=true;$('pauseState').hidden=false;tick=setInterval(paintTimer,250);}});
+$('resetTimer').addEventListener('click',()=>{stopTimer();elapsed=0;paintTimer();});
+$('knowReview').addEventListener('click',()=>{$('knowResult').hidden=false;$('againResult').hidden=true;});
+$('againReview').addEventListener('click',()=>{$('knowResult').hidden=true;$('againResult').hidden=false;});
+function period(value){document.querySelectorAll('[data-period]').forEach(p=>p.hidden=p.dataset.period!==value);$('monthly').setAttribute('aria-pressed',String(value==='monthly'));$('yearly').setAttribute('aria-pressed',String(value==='yearly'));}
+$('monthly').addEventListener('click',()=>period('monthly'));$('yearly').addEventListener('click',()=>period('yearly'));
+document.querySelectorAll('[data-plan]').forEach(b=>b.addEventListener('click',()=>{$('planResult').textContent='انتخاب نمایشی: '+b.dataset.plan+' — هیچ اشتراکی فعال نشده است.';$('planResult').hidden=false;document.querySelectorAll('[data-plan]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));}));
+$('applySettings').addEventListener('click',()=>{$('settingsResult').textContent='در این اجرا اعمال شد: '+$('settingsGoal').value+' · '+$('settingsTime').value+' دقیقه';$('settingsResult').hidden=false;});
+document.querySelectorAll('form').forEach(f=>f.addEventListener('submit',e=>e.preventDefault()));
+});
+
+</script>
+ <!--
+Bundled dependency licenses
+ISC License
+
+Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2026 as part of Feather (MIT). All other copyright (c) for Lucide are held by Lucide Contributors 2026.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+—-
+
+The MIT License (MIT) (for portions derived from Feather)
+
+Copyright (c) 2013-2026 Cole Bemis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+MIT License
+
+Copyright (c) Tailwind Labs, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+-->
+</head>
+ <body data-template-id="__page-root" style="background: rgb(255, 255, 255);">
+  <div class="app-wrapper w-full">
+   <header data-template-id="header" class="canva-header header" style="background: rgb(15, 54, 102); color: rgb(255, 255, 255);">
+    <div class="shell header-grid"><button class="brand" data-go="landing" aria-label="خانه SpeakFlow"><span class="brand-symbol"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-messages-square" aria-hidden="true"><path d="M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path><path d="M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1"></path></svg></span><span><span data-template-id="brand-name" class="canva-text brand-name" style="font-weight: 700; font-style: normal; font-size: 16px;">SpeakFlow</span><span data-template-id="brand-caption" class="canva-text brand-caption" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 10px;">ابوالفضل پورجعفر</span></span></button>
+     <nav id="mainNav" class="nav" aria-label="ناوبری اصلی"><button data-go="landing" data-template-id="nav-home" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">خانه</button><button data-go="partners" data-template-id="nav-partners" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">پارتنر مکالمه</button><button data-go="courses" data-template-id="nav-courses" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دوره‌ها</button><button data-go="contents" data-template-id="nav-contents" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">محتوا</button><button data-go="teachers" data-template-id="nav-teachers" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">اساتید</button><button data-go="about" data-template-id="nav-about" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">درباره ما</button>
+     </nav>
+     <div class="header-actions">
+      <button class="btn quiet profile-link" data-go="profile" aria-label="پروفایل">A</button><button data-template-id="header-cta" class="canva-button btn" data-go="partners" style="background: rgb(244, 197, 66); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 700; font-style: normal; font-size: 16px;">شروع مکالمه</button><button id="menuToggle" class="btn icon-button menu-toggle" aria-label="منو" aria-expanded="false" aria-controls="mainNav"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu" aria-hidden="true"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg></button>
+     </div>
+    </div>
+   </header>
+   <main class="shell">
+    <section id="landing" class="view">
+     <div class="hero">
+      <div class="hero-copy">
+       <span data-template-id="hero-tag" class="canva-tag tag english" style="background: rgb(255, 248, 217); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 12px;">AI-powered speaking practice</span>
+       <h1 data-template-id="hero-title" class="canva-text" style="color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 48px;">انگلیسی رو فقط یاد نگیر؛ باهاش حرف بزن.</h1>
+       <p data-template-id="hero-subtitle" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 17px;">هر روز مکالمه تمرین کن، اشتباهاتت را بشناس و هدفمند ادامه بده.</p>
+       <div class="actions">
+        <button data-template-id="hero-primary" class="canva-button btn" data-go="partners" style="background: rgb(244, 197, 66); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 700; font-style: normal; font-size: 16px;">شروع تمرین مکالمه</button><button data-template-id="hero-secondary" class="canva-button btn secondary" data-go="courses" style="background: rgb(255, 255, 255); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 700; font-style: normal; font-size: 16px;">دیدن دوره‌ها</button>
+       </div>
+      </div>
+      <div class="stage" data-template-id="hero-stage" style="background: rgb(15, 54, 102);">
+       <div data-template-id="stage-label" class="canva-text stage-label" style="background: rgb(255, 255, 255); color: rgb(15, 54, 102); font-weight: 400; font-style: normal; font-size: 12px;">AI Conversation Partner · B1 — Daily Life</div>
+       <div class="orb" aria-hidden="true">
+        <div class="face"></div>
+       </div><button class="btn canva-button" data-template-id="stage-start" data-go="practice" style="background: rgb(244, 197, 66); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Start Speaking</button>
+      </div>
+     </div>
+     <section class="section">
+      <div class="section-head">
+       <h2 data-template-id="problem-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 24px;">چرا موقع حرف زدن گیر می‌کنی؟</h2>
+      </div>
+      <div class="grid-4">
+       <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle-question" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
+        <p data-template-id="problem-one" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">می‌فهمم ولی نمی‌تونم جواب بدم</p>
+       </article>
+       <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
+        <p data-template-id="problem-two" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">پارتنر برای تمرین ندارم</p>
+       </article>
+       <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain" aria-hidden="true"><path d="M12 18V5"></path><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"></path><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"></path><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"></path><path d="M18 18a4 4 0 0 0 2-7.464"></path><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"></path><path d="M6 18a4 4 0 0 1-2-7.464"></path><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"></path></svg>
+        <p data-template-id="problem-three" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">کلمات رو زود فراموش می‌کنم</p>
+       </article>
+       <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-target" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+        <p data-template-id="problem-four" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">نمی‌دونم روی چی تمرین کنم</p>
+       </article>
+      </div>
+     </section>
+     <section class="section card dark canva-card" data-template-id="dark-card" style="background: rgb(15, 54, 102); color: rgb(255, 255, 255);">
+      <h2 data-template-id="cycle-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 700; font-style: normal; font-size: 24px;">یک چرخه ساده؛ یک تغییر واقعی.</h2>
+      <div class="cycle">
+       <span data-template-id="cycle-learn" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Learn</span><span data-template-id="cycle-speak" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Speak</span><span data-template-id="cycle-analyze" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Analyze</span><span data-template-id="cycle-review" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Review</span><span data-template-id="cycle-improve" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Improve</span>
+      </div>
+     </section>
+     <section class="section">
+      <div class="section-head">
+       <h2 data-template-id="landing-partners-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 24px;">پارتنر مکالمه‌ات آماده‌ست.</h2>
+      </div>
+      <div class="grid-2">
+       <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+        <h3 data-template-id="landing-alex" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 19px;">Alex · Friendly Friend</h3>
+        <p data-template-id="landing-alex-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مکالمه‌های روزمره، فیلم و سرگرمی.</p><button data-template-id="start-alex" class="canva-button btn" data-select="Alex" style="background: rgb(244, 197, 66); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">شروع با Alex</button>
+       </article>
+       <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+        <h3 data-template-id="landing-emma" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 19px;">Emma · Travel Partner</h3>
+        <p data-template-id="landing-emma-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">برای سفرهای واقعی آماده شو.</p><button data-template-id="start-emma" class="canva-button btn" data-select="Emma" style="background: rgb(244, 197, 66); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">شروع با Emma</button>
+       </article>
+      </div>
+     </section>
+     <section class="section grid-2">
+      <article class="card dark canva-card" data-template-id="dark-card" style="background: rgb(15, 54, 102); color: rgb(255, 255, 255);">
+       <h2 data-template-id="review-promo" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">یادگیری را به حافظه بلندمدت ببر.</h2><button data-template-id="review-cta" class="canva-button btn" data-go="review" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مرور امروزت</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="analysis-promo" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">هر مکالمه، یک بازخورد مفید.</h2><button data-template-id="analysis-cta" class="canva-button btn secondary" data-go="analysis" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دیدن تحلیل نمونه</button>
+      </article>
+     </section>
+     <section class="section card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+      <h2 data-template-id="feedback-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">بازخورد کاربران</h2>
+      <p data-template-id="feedback-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">نمونه رضایت برای جایگزینی با داده واقعی.</p>
+     </section>
+    </section>
+    <section id="login" class="view" hidden="">
+     <article class="card narrow canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+      <h1 data-template-id="login-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">خوش برگشتی!</h1>
+      <p data-template-id="access-note" class="canva-text notice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">این نمای عمومی پروتوتایپ است؛ ورود واقعی و دریافت اطلاعات حساب ندارد.</p><button data-template-id="enter-demo" class="canva-button btn" data-go="dashboard" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مشاهده داشبورد نمونه</button><button data-template-id="signup-link" class="canva-button btn secondary" data-go="signup" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">نمای ثبت‌نام</button>
+     </article>
+    </section>
+    <section id="signup" class="view" hidden="">
+     <article class="card narrow canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+      <h1 data-template-id="signup-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">شروعی برای صدای تو.</h1>
+      <p data-template-id="signup-note" class="canva-text notice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">ثبت‌نام واقعی در این نمونه انجام نمی‌شود؛ بدون ایجاد حساب مسیر را ببین.</p><button data-template-id="explore-demo" class="canva-button btn" data-go="partners" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دیدن پارتنرها</button><button data-template-id="login-link" class="canva-button btn secondary" data-go="login" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">نمای ورود</button>
+     </article>
+    </section>
+    <section id="dashboard" class="view" hidden="">
+     <article class="card dark canva-card" data-template-id="dark-card" style="background: rgb(15, 54, 102); color: rgb(255, 255, 255);">
+      <p data-template-id="greeting" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 16px;">Good morning, Abolfazl</p>
+      <h1 data-template-id="dashboard-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">برای تمرین امروز آماده‌ای؟</h1><button data-template-id="dashboard-start" class="canva-button btn" data-go="partners" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">شروع مکالمه</button>
+     </article>
+     <div class="grid-3 section">
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="goal-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">هدف امروز</h2><strong data-template-id="goal-number" class="canva-text metric" style="font-weight: 700; font-style: normal; font-size: 28px;">7 / 10 min</strong>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="waiting-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">مرور</h2>
+       <p data-template-id="waiting-copy" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۸ مورد آماده مرور</p><button class="btn secondary canva-button" data-template-id="review-cta" data-go="review" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مرور امروزت</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="session-title" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">Talking About Your Weekend</h2>
+       <p data-template-id="session-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">با Alex، ۳ دقیقه باقی مانده.</p><button data-template-id="continue" class="canva-button btn" data-go="practice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">ادامه تمرین</button>
+      </article>
+     </div>
+     <div class="actions">
+      <button data-template-id="profile-cta" class="canva-button btn secondary" data-go="profile" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">پروفایل</button><button data-template-id="settings-cta" class="canva-button btn secondary" data-go="settings" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تنظیمات</button>
+     </div>
+    </section>
+    <section id="profile" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="profile-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">پروفایل تو</h1>
+     </div>
+     <div class="grid-2">
+      <article class="card dark canva-card" data-template-id="dark-card" style="background: rgb(15, 54, 102); color: rgb(255, 255, 255);">
+       <div class="avatar">
+        A
+       </div>
+       <h2 data-template-id="profile-name" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">Abolfazl</h2>
+       <p data-template-id="profile-level" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">B1 — Speaker · هدف: Speaking</p>
+       <p data-template-id="profile-stats" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 16px;">7 days · 4h 24m speaking</p>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="learning-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">نمای یادگیری</h2>
+       <p data-template-id="learning-stats" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۲۴ جلسه · ۴۲ عبارت یادگرفته‌شده</p>
+       <p data-template-id="weak-areas" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 16px;">Articles · Response Speed</p><button data-template-id="settings-cta" class="canva-button btn" data-go="settings" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تنظیمات</button>
+      </article>
+     </div>
+    </section>
+    <section id="partners" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="partners-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">امروز با کی حرف می‌زنی؟</h1>
+      <p data-template-id="partners-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">موضوع و پارتنر مناسب امروزت را انتخاب کن.</p>
+     </div>
+     <div class="toolbar">
+      <div class="search-field">
+       <label for="partnerSearch" data-template-id="partner-search-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">جست‌وجوی پارتنر یا موضوع</label><input id="partnerSearch" class="input">
+      </div><button class="filter canva-button" data-template-id="all-filter" data-topic="all" aria-pressed="true" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">همه</button><button class="filter canva-button" data-template-id="daily-filter" data-topic="daily" aria-pressed="false" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Daily Life</button><button class="filter canva-button" data-template-id="travel-filter" data-topic="travel" aria-pressed="false" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Travel</button><button class="filter canva-button" data-template-id="work-filter" data-topic="work" aria-pressed="false" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Work</button>
+     </div>
+     <div class="grid-4" id="partnerList">
+      <article class="card canva-card" data-template-id="card" data-partner="Alex" data-search="alex daily life movies hobbies" data-category="daily" style="background: rgb(255, 255, 255);">
+       <div class="partner-top">
+        <h2 data-template-id="alex-name" class="canva-text" style="font-weight: 400; font-style: normal; font-size: 24px;">Alex</h2>
+        <div class="avatar">
+         A
+        </div>
+       </div>
+       <p data-template-id="alex-role" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Friendly Friend · B1</p>
+       <p data-template-id="alex-topics" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 16px;">Daily Life · Movies · Hobbies</p><button class="btn canva-button" data-template-id="conversation" data-select="Alex" style="background: rgb(244, 197, 66); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">شروع مکالمه</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" data-partner="Emma" data-search="emma travel airport hotel" data-category="travel" style="background: rgb(255, 255, 255);">
+       <div class="partner-top">
+        <h2 data-template-id="emma-name" class="canva-text" style="font-weight: 400; font-style: normal; font-size: 24px;">Emma</h2>
+        <div class="avatar">
+         E
+        </div>
+       </div>
+       <p data-template-id="emma-role" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Travel Partner · A2–B1</p>
+       <p data-template-id="emma-topics" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 16px;">Travel · Airport · Hotel</p><button class="btn canva-button" data-template-id="conversation" data-select="Emma" style="background: rgb(244, 197, 66); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">شروع مکالمه</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" data-partner="Daniel" data-search="daniel interview career business work" data-category="work" style="background: rgb(255, 255, 255);">
+       <div class="partner-top">
+        <h2 data-template-id="daniel-name" class="canva-text" style="font-weight: 400; font-style: normal; font-size: 24px;">Daniel</h2>
+        <div class="avatar">
+         D
+        </div>
+       </div>
+       <p data-template-id="daniel-role" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Job Interviewer · B1–B2</p>
+       <p data-template-id="daniel-topics" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 16px;">Interview · Career · Business</p><button class="btn canva-button" data-template-id="conversation" data-select="Daniel" style="background: rgb(244, 197, 66); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">شروع مکالمه</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" data-partner="Mia" data-search="mia grammar vocabulary conversation" data-category="daily" style="background: rgb(255, 255, 255);">
+       <div class="partner-top">
+        <h2 data-template-id="mia-name" class="canva-text" style="font-weight: 400; font-style: normal; font-size: 24px;">Mia</h2>
+        <div class="avatar">
+         M
+        </div>
+       </div>
+       <p data-template-id="mia-role" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">English Teacher · A2–B2</p>
+       <p data-template-id="mia-topics" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 16px;">Grammar · Vocabulary</p><button class="btn canva-button" data-template-id="conversation" data-select="Mia" style="background: rgb(244, 197, 66); color: rgb(15, 54, 102); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">شروع مکالمه</button>
+      </article>
+     </div>
+     <p id="partnerEmpty" hidden="" data-template-id="empty-search" class="canva-text notice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">نتیجه‌ای پیدا نشد.</p>
+    </section>
+    <section id="practice" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="practice-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">Speaking Practice</h1>
+      <p data-template-id="practice-note" class="canva-text notice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">خودتمرینی نمونه با متن و تایمر؛ صدا ضبط نمی‌شود و پاسخ هوشمند تولید نمی‌شود.</p>
+     </div>
+     <div class="room">
+      <aside class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <div id="practiceAvatar" class="avatar">
+        A
+       </div>
+       <div>
+        <h2 id="practiceName" data-template-id="practice-name" class="canva-text english" style="color: rgb(15, 54, 102);">Alex</h2>
+        <p id="practiceRole" data-template-id="practice-role" class="canva-text lead" style="color: rgb(78, 102, 130);">Friendly Friend · B1</p>
+       </div>
+      </aside>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <p data-template-id="scenario" class="canva-text notice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">سناریو: در رستوران، میز و غذای گیاهی سفارش بده.</p>
+       <p data-template-id="prompt-one" class="canva-text bubble ai" style="background: rgb(15, 54, 102); color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">Hi! Welcome. What would you like to do tonight?</p>
+       <p data-template-id="prompt-answer" class="canva-text bubble" style="background: rgb(234, 240, 247); color: rgb(15, 54, 102); font-weight: 400; font-style: normal; font-size: 16px;">Hi, I'd like a table for two, please.</p>
+       <p data-template-id="prompt-two" class="canva-text bubble ai" style="background: rgb(15, 54, 102); color: rgb(255, 255, 255); font-weight: 400; font-style: normal; font-size: 16px;">What kind of meal would you like to order?</p><strong id="timer" data-template-id="practice-timer" class="canva-text metric" role="timer" style="color: rgb(15, 54, 102); font-weight: 700; font-size: 28px;">00:00</strong>
+       <div class="actions">
+        <button id="timerToggle" class="btn"><span id="startState" data-template-id="timer-start" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">شروع تایمر</span><span id="pauseState" data-template-id="timer-pause" class="canva-text" hidden="" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">توقف تایمر</span></button><button id="resetTimer" data-template-id="timer-reset" class="canva-button btn secondary" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">از ابتدا</button><button data-template-id="finish-session" class="canva-button btn secondary" data-go="analysis" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دیدن تحلیل نمونه</button>
+       </div>
+      </article>
+     </div>
+    </section>
+    <section id="analysis" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="analysis-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">تحلیل مکالمه</h1>
+      <p data-template-id="analysis-note" class="canva-text notice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">نمونه نمایشی؛ این اعداد و متن از صدای شما محاسبه نشده‌اند.</p>
+     </div>
+     <div class="grid-4">
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="fluency-label" class="canva-text" style="font-weight: 400; font-style: normal; font-size: 18px;">Fluency</h2><strong data-template-id="fluency-number" class="canva-text metric" style="font-weight: 700; font-style: normal; font-size: 28px;">72%</strong>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="vocabulary-label" class="canva-text" style="font-weight: 400; font-style: normal; font-size: 18px;">Vocabulary</h2><strong data-template-id="vocabulary-number" class="canva-text metric" style="font-weight: 700; font-style: normal; font-size: 28px;">68%</strong>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="grammar-label" class="canva-text" style="font-weight: 400; font-style: normal; font-size: 18px;">Grammar</h2><strong data-template-id="grammar-number" class="canva-text metric" style="font-weight: 700; font-style: normal; font-size: 28px;">61%</strong>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="pronunciation-label" class="canva-text" style="font-weight: 400; font-style: normal; font-size: 18px;">Pronunciation</h2><strong data-template-id="pronunciation-number" class="canva-text metric" style="font-weight: 700; font-style: normal; font-size: 28px;">74%</strong>
+      </article>
+     </div>
+     <div class="grid-2 section">
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="transcript-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">متن نمونه</h2>
+       <p data-template-id="transcript" class="canva-text bubble" style="font-weight: 400; font-style: normal; font-size: 16px;">I am agree with you. I would like a vegetarian meal.</p>
+       <p data-template-id="correction" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">درست: I agree with you. قبل از agree از am استفاده نمی‌کنیم.</p>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="phrases-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">عبارت‌های کاربردی</h2>
+       <p data-template-id="phrases" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 16px;">Sounds good · I’m not sure · It depends · I mean…</p><button data-template-id="review-cta" class="canva-button btn" data-go="review" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مرور امروزت</button>
+      </article>
+     </div>
+     <div class="actions">
+      <button data-template-id="practice-again" class="canva-button btn" data-go="practice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دوباره تمرین کن</button><button data-template-id="dashboard-link" class="canva-button btn secondary" data-go="dashboard" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">داشبورد</button>
+     </div>
+    </section>
+    <section id="review" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="review-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">چیزهایی که یاد گرفتی، قرار نیست یادت بره.</h1>
+      <p data-template-id="review-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مرور کوتاه عبارت‌های کاربردی مکالمه.</p>
+     </div>
+     <div class="grid-3">
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="reviews-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 18px;">مرور امروز</h2><strong data-template-id="reviews-number" class="canva-text metric" style="font-weight: 700; font-style: normal; font-size: 28px;">12</strong>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="completed-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 18px;">انجام‌شده، نمونه</h2><strong data-template-id="completed-number" class="canva-text metric" style="font-weight: 700; font-style: normal; font-size: 28px;">9</strong>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="mastered-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 18px;">عبارت‌های یادگرفته‌شده</h2><strong data-template-id="mastered-number" class="canva-text metric" style="font-weight: 700; font-style: normal; font-size: 28px;">42</strong>
+      </article>
+     </div>
+     <article class="card section canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+      <span data-template-id="review-tag" class="canva-tag tag" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 12px;">Vocabulary · نمونه مرور</span>
+      <h2 data-template-id="review-phrase" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">It depends</h2>
+      <p data-template-id="review-meaning" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">یعنی: بستگی دارد.</p>
+      <p data-template-id="review-example" class="canva-text bubble" style="font-weight: 400; font-style: normal; font-size: 16px;">It depends on the weather.</p>
+      <div class="actions">
+       <button id="knowReview" data-template-id="review-know" class="canva-button btn" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">بلدم</button><button id="againReview" data-template-id="review-again" class="canva-button btn secondary" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دوباره تمرین می‌کنم</button>
+      </div>
+      <p id="knowResult" data-template-id="review-known-result" class="canva-text notice" hidden="" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">خوب بود! در این نمونه، مرور بعدی دیرتر پیشنهاد می‌شود.</p>
+      <p id="againResult" data-template-id="review-again-result" class="canva-text notice" hidden="" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">عبارت و مثال را یک بار دیگر با صدای بلند تکرار کن.</p>
+     </article>
+    </section>
+    <section id="courses" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="courses-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">دوره‌هایی برای مکالمه واقعی.</h1>
+     </div>
+     <div class="toolbar">
+      <div class="search-field">
+       <label for="courseSearch" data-template-id="course-search-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">جست‌وجوی دوره</label><input id="courseSearch" class="input">
+      </div>
+     </div>
+     <div class="grid-3" id="courseList">
+      <article class="card canva-card" data-template-id="card" data-search="speaking basics b1" style="background: rgb(255, 255, 255);">
+       <span class="tag canva-tag" data-template-id="course-one-tag" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 12px;">B1 · 12 lessons</span>
+       <h2 data-template-id="course-one-title" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">Speaking Basics</h2>
+       <p data-template-id="course-one-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۴ ساعت · ابوالفضل پورجعفر</p>
+       <p data-template-id="course-one-price" class="canva-text price" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 16px;">۱۹۹ هزار تومان</p><button class="btn canva-button" data-template-id="course-open" data-course="basic" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مشاهده دوره</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" data-search="business english b1 b2" style="background: rgb(255, 255, 255);">
+       <span class="tag canva-tag" data-template-id="course-two-tag" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 12px;">B1–B2 · 16 lessons</span>
+       <h2 data-template-id="course-two-title" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">Business English</h2>
+       <p data-template-id="course-two-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۶ ساعت · Daniel</p>
+       <p data-template-id="course-two-price" class="canva-text price" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 16px;">۳۹۹ هزار تومان</p><button class="btn canva-button" data-template-id="course-open" data-course="business" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مشاهده دوره</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" data-search="travel english a2 b1" style="background: rgb(255, 255, 255);">
+       <span class="tag canva-tag" data-template-id="course-three-tag" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 12px;">A2–B1 · 10 lessons</span>
+       <h2 data-template-id="course-three-title" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">Travel English</h2>
+       <p data-template-id="course-three-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۳ ساعت · Emma</p>
+       <p data-template-id="course-three-price" class="canva-text price" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 16px;">۱۹۹ هزار تومان</p><button class="btn canva-button" data-template-id="course-open" data-course="travel" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مشاهده دوره</button>
+      </article>
+     </div>
+     <p id="courseEmpty" data-template-id="empty-search" class="canva-text notice" hidden="" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">نتیجه‌ای پیدا نشد.</p>
+    </section>
+    <section id="course-detail" class="view" hidden="">
+     <article class="card dark canva-card" data-template-id="dark-card" style="background: rgb(15, 54, 102); color: rgb(255, 255, 255);">
+      <h1 data-course-panel="basic" data-template-id="detail-basic-title" class="canva-text english" style="font-weight: 800; font-style: normal; font-size: 32px;">Speaking Basics</h1>
+      <h1 data-course-panel="business" data-template-id="detail-business-title" class="canva-text english" hidden="" style="font-weight: 800; font-style: normal; font-size: 32px;">Business English</h1>
+      <h1 data-course-panel="travel" data-template-id="detail-travel-title" class="canva-text english" hidden="" style="font-weight: 800; font-style: normal; font-size: 32px;">Travel English</h1>
+      <p data-course-panel="basic" data-template-id="detail-basic-copy" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">از جمله‌های کوتاه تا مکالمه طبیعی روزمره.</p>
+      <p data-course-panel="business" data-template-id="detail-business-copy" class="canva-text" hidden="" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تمرین مکالمه حرفه‌ای و موقعیت‌های شغلی.</p>
+      <p data-course-panel="travel" data-template-id="detail-travel-copy" class="canva-text" hidden="" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مکالمه کاربردی در فرودگاه، هتل و سفر.</p><button data-template-id="pricing-link" class="canva-button btn" data-go="pricing" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مشاهده اشتراک نمونه</button>
+     </article>
+     <div class="grid-2 section">
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="curriculum-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">سرفصل‌ها</h2>
+       <p data-course-panel="basic" data-template-id="curriculum-basic" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 16px;">Small Talk · Daily Routines · Weekend Stories · Real-life Practice</p>
+       <p data-course-panel="business" data-template-id="curriculum-business" class="canva-text english" hidden="" style="font-weight: 400; font-style: normal; font-size: 16px;">Interview · Career · Business Conversation</p>
+       <p data-course-panel="travel" data-template-id="curriculum-travel" class="canva-text english" hidden="" style="font-weight: 400; font-style: normal; font-size: 16px;">Airport · Hotel · Restaurant</p>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="instructor-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">مدرس و زمان</h2>
+       <p data-course-panel="basic" data-template-id="instructor-basic" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">ابوالفضل پورجعفر · ۴ ساعت · B1</p>
+       <p data-course-panel="business" data-template-id="instructor-business" class="canva-text" hidden="" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Daniel · ۶ ساعت · B1–B2</p>
+       <p data-course-panel="travel" data-template-id="instructor-travel" class="canva-text" hidden="" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Emma · ۳ ساعت · A2–B1</p><button data-template-id="nav-courses" class="canva-button btn secondary" data-go="courses" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دوره‌ها</button>
+      </article>
+     </div>
+    </section>
+    <section id="contents" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="contents-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">محتوای کوتاه برای مکالمه واقعی‌تر.</h1>
+     </div>
+     <div class="toolbar">
+      <div class="search-field">
+       <label for="contentSearch" data-template-id="content-search-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">جست‌وجوی محتوا</label><input id="contentSearch" class="input">
+      </div>
+     </div>
+     <div class="grid-3" id="contentList">
+      <article class="card canva-card" data-template-id="card" data-search="conversation keep going" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="content-one" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">How to keep a conversation going</h2>
+       <p data-template-id="content-one-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۳ دقیقه · جمله‌های طبیعی برای ادامه گفت‌وگو.</p><button data-template-id="practice-again" class="canva-button btn secondary" data-go="practice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دوباره تمرین کن</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" data-search="grammar agree common mistakes" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="content-two" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">Why “I am agree” is wrong</h2>
+       <p data-template-id="content-two-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۲ دقیقه · خطاهای رایج</p><button data-template-id="review-cta" class="canva-button btn secondary" data-go="review" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مرور امروزت</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" data-search="pronunciation vegetarian" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="content-three" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">Say vegetarian clearly</h2>
+       <p data-template-id="content-three-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۴ دقیقه · راهنمای تلفظ</p><button data-template-id="practice-again" class="canva-button btn secondary" data-go="practice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دوباره تمرین کن</button>
+      </article>
+     </div>
+     <p id="contentEmpty" data-template-id="empty-search" class="canva-text notice" hidden="" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">نتیجه‌ای پیدا نشد.</p>
+    </section>
+    <section id="teachers" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="teachers-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">آدم‌هایی که پشت مسیر تو هستند.</h1>
+     </div>
+     <div class="grid-3">
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <img data-template-id="teacher-founder-image" class="canva-image teacher-photo" loading="lazy" src="https://images.pexels.com/photos/7983621/pexels-photo-7983621.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=800" alt="Confident young man with glasses smiling in a library, evoking a professional and approachable vibe.">
+       <h2 data-template-id="founder-name" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">ابوالفضل پورجعفر</h2>
+       <p data-template-id="founder-role" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Founder / English Educator</p><button data-template-id="about-link" class="canva-button btn secondary" data-go="about" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">داستان SpeakFlow</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <div class="avatar">
+        S
+       </div>
+       <h2 data-template-id="sarah-name" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">Sarah Miller</h2>
+       <p data-template-id="sarah-role" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Conversation Coach · B1–C1</p><button data-template-id="nav-courses" class="canva-button btn secondary" data-go="courses" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دوره‌ها</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <div class="avatar">
+        D
+       </div>
+       <h2 data-template-id="teacher-daniel-name" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 24px;">Daniel Reed</h2>
+       <p data-template-id="teacher-daniel-role" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Job Interview · Business English</p><button data-template-id="start-daniel" class="canva-button btn secondary" data-select="Daniel" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تمرین با Daniel</button>
+      </article>
+     </div>
+    </section>
+    <section id="about" class="view" hidden="">
+     <article class="card dark canva-card" data-template-id="dark-card" style="background: rgb(15, 54, 102); color: rgb(255, 255, 255);">
+      <h1 data-template-id="about-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">SpeakFlow از یک سؤال شروع شد:</h1>
+      <p data-template-id="about-question" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">چرا انگلیسی می‌دانیم، اما در لحظه واقعی نمی‌توانیم حرف بزنیم؟</p>
+     </article>
+     <div class="grid-2 section">
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="mission-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">Mission</h2>
+       <p data-template-id="mission-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تمرین کوتاه، بازخورد قابل فهم و تکرار هوشمند؛ برای پیدا کردن صدای خودت.</p>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="philosophy-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">Product Philosophy</h2>
+       <p data-template-id="philosophy-copy" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">هدف اینه که بتونی از چیزی که بلدی واقعاً استفاده کنی.</p><button data-template-id="contact-link" class="canva-button btn secondary" data-go="contact" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تماس با ما</button>
+      </article>
+     </div>
+    </section>
+    <section id="contact" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="contact-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">حرفی داری؟ بشنویمت.</h1>
+      <p data-template-id="contact-note" class="canva-text notice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">اطلاعات تماس نمونه‌اند؛ در این پروتوتایپ پیام ارسال نمی‌شود.</p>
+     </div>
+     <article class="card narrow canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+      <h2 data-template-id="contact-details-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">اطلاعات تماس</h2>
+      <p data-template-id="contact-details" class="canva-text english" style="font-weight: 400; font-style: normal; font-size: 16px;">021 0000 0000 · hello@speakflow.demo · @speakflow.demo</p>
+      <h3 data-template-id="faq-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 19px;">آیا تمرین‌ها کوتاه‌اند؟</h3>
+      <p data-template-id="faq-copy" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">بله، از ۵ دقیقه شروع می‌شوند.</p>
+     </article>
+    </section>
+    <section id="pricing" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="pricing-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">پلنی که با ریتم تو جور است.</h1>
+      <p data-template-id="pricing-note" class="canva-text notice" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 13px;">قیمت و انتخاب پلن نمونه است؛ پرداخت یا فعال‌سازی واقعی انجام نمی‌شود.</p>
+     </div>
+     <div class="toolbar">
+      <button id="monthly" data-template-id="monthly-label" class="canva-button filter" aria-pressed="true" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">ماهانه</button><button id="yearly" data-template-id="yearly-label" class="canva-button filter" aria-pressed="false" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">سالانه</button>
+     </div>
+     <div class="grid-3">
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="general-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">General</h2>
+       <p data-period="monthly" data-template-id="general-month" class="canva-text price" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 16px;">۱۹۹ هزار تومان / ماه</p>
+       <p data-period="yearly" data-template-id="general-year" class="canva-text price" hidden="" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 16px;">۱,۹۹۰ هزار تومان / سال</p>
+       <p data-template-id="general-features" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Daily Speaking · Basic Partner · Limited Reviews</p><button data-template-id="choose-general" class="canva-button btn secondary" data-plan="General" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">انتخاب نمونه General</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <span data-template-id="popular" class="canva-tag tag" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 12px;">Most Popular</span>
+       <h2 data-template-id="pro-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">Pro</h2>
+       <p data-period="monthly" data-template-id="pro-month" class="canva-text price" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 16px;">۳۹۹ هزار تومان / ماه</p>
+       <p data-period="yearly" data-template-id="pro-year" class="canva-text price" hidden="" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 16px;">۳,۹۹۰ هزار تومان / سال</p>
+       <p data-template-id="pro-features" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Unlimited Speaking · All Partners · Full Review · Advanced Analysis</p><button data-template-id="choose-pro" class="canva-button btn" data-plan="Pro" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">انتخاب نمونه Pro</button>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="primary-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">Primary</h2>
+       <p data-period="monthly" data-template-id="primary-month" class="canva-text price" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 16px;">۶۹۹ هزار تومان / ماه</p>
+       <p data-period="yearly" data-template-id="primary-year" class="canva-text price" hidden="" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 16px;">۶,۹۹۰ هزار تومان / سال</p>
+       <p data-template-id="primary-features" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Premium Partners · Advanced Analysis · Exclusive Content</p><button data-template-id="choose-primary" class="canva-button btn secondary" data-plan="Primary" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">انتخاب نمونه Primary</button>
+      </article>
+     </div>
+     <p id="planResult" data-template-id="plan-result" class="canva-text notice section" role="status" hidden="" style="color: rgb(15, 54, 102); font-size: 13px;"></p>
+    </section>
+    <section id="settings" class="view" hidden="">
+     <div class="view-head">
+      <h1 data-template-id="settings-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 800; font-style: normal; font-size: 32px;">تنظیمات نمونه</h1>
+      <p data-template-id="settings-note" class="canva-text lead" style="color: rgb(78, 102, 130); font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تغییرات فقط روی همین اجرای نمونه اعمال می‌شوند.</p>
+     </div>
+     <div class="grid-2">
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="settings-learning" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">Profile &amp; Learning</h2>
+       <div class="field">
+        <label for="settingsGoal" data-template-id="goal-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">هدف یادگیری</label><select id="settingsGoal" class="input"><option value="Speaking" data-template-id="option-speaking" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Speaking</option><option value="Travel" data-template-id="option-travel" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Travel</option><option value="Work" data-template-id="option-work" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Work</option></select>
+       </div>
+       <div class="field">
+        <label for="settingsTime" data-template-id="time-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">زمان روزانه</label><select id="settingsTime" class="input"><option value="10" data-template-id="option-ten" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۱۰ دقیقه</option><option value="20" data-template-id="option-twenty" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۲۰ دقیقه</option><option value="30" data-template-id="option-thirty" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">۳۰ دقیقه</option></select>
+       </div><button id="applySettings" data-template-id="apply-settings" class="canva-button btn" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">اعمال در نمونه</button>
+       <p id="settingsResult" data-template-id="settings-result" class="canva-text notice" role="status" hidden="" style="color: rgb(15, 54, 102); font-size: 13px;"></p>
+      </article>
+      <article class="card canva-card" data-template-id="card" style="background: rgb(255, 255, 255);">
+       <h2 data-template-id="notifications-title" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 24px;">یادآوری‌های نمونه</h2>
+       <div class="check-field">
+        <input id="reviewReminder" type="checkbox" checked=""><label for="reviewReminder" data-template-id="reminder-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">یادآوری مرور امروز</label>
+       </div>
+       <div class="check-field">
+        <input id="productNews" type="checkbox"><label for="productNews" data-template-id="news-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">خبرهای محصول</label>
+       </div><button data-template-id="pricing-link" class="canva-button btn secondary" data-go="pricing" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مشاهده اشتراک نمونه</button><button data-template-id="nav-home" class="canva-button btn secondary" data-go="landing" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">خانه</button>
+      </article>
+     </div>
+    </section>
+   </main>
+   <nav class="bottom-nav" aria-label="ناوبری موبایل">
+    <button data-go="dashboard" data-template-id="dashboard-link" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">داشبورد</button><button data-go="partners" data-template-id="bottom-practice" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تمرین</button><button data-go="review" data-template-id="bottom-review" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مرور</button><button data-go="profile" data-template-id="profile-cta" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">پروفایل</button>
+   </nav>
+   <footer class="map">
+    <button id="mapToggle" class="btn" aria-expanded="false" aria-controls="mapPanel"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map" aria-hidden="true"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg><span data-template-id="map-label" class="canva-text" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">Prototype Map</span></button>
+    <nav id="mapPanel" class="map-panel" aria-label="نقشه پروتوتایپ" hidden=""><button data-go="landing" data-template-id="nav-home" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">خانه</button><button data-go="login" data-template-id="map-login" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">ورود، نمای عمومی</button><button data-go="signup" data-template-id="map-signup" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">ثبت‌نام، نمای عمومی</button><button data-go="dashboard" data-template-id="dashboard-link" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">داشبورد</button><button data-go="profile" data-template-id="profile-cta" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">پروفایل</button><button data-go="partners" data-template-id="nav-partners" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">پارتنر مکالمه</button><button data-go="practice" data-template-id="bottom-practice" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تمرین</button><button data-go="analysis" data-template-id="map-analysis" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تحلیل نمونه</button><button data-go="review" data-template-id="bottom-review" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">مرور</button><button data-go="courses" data-template-id="nav-courses" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">دوره‌ها</button><button data-go="course-detail" data-template-id="map-detail" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">جزئیات دوره</button><button data-go="contents" data-template-id="nav-contents" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">محتوا</button><button data-go="teachers" data-template-id="nav-teachers" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">اساتید</button><button data-go="about" data-template-id="nav-about" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">درباره ما</button><button data-go="contact" data-template-id="contact-link" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تماس با ما</button><button data-go="pricing" data-template-id="map-pricing" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">اشتراک</button><button data-go="settings" data-template-id="settings-cta" class="canva-button" style="font-family: Vazirmatn; font-weight: 400; font-style: normal; font-size: 16px;">تنظیمات</button>
+    </nav>
+   </footer>
+  </div>
+  
+ 
+</body></html>
