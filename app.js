@@ -16,6 +16,27 @@
   let viewStage = state.stage;
   let practiceError = false;
   let practiceMode = 'text';
+  let screen = 'dashboard';
+  const iconPaths = {
+    dashboard: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/>',
+    roadmap: '<circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/><path d="M7 19h8a4 4 0 0 0 0-8H9a4 4 0 0 1 0-8h6"/>',
+    review: '<path d="M3 10a9 9 0 1 1 2 8M3 4v6h6m3-4v6l4 2"/>',
+    progress: '<path d="M4 20V10m8 10V4m8 16v-7M2 21h20"/>',
+    subscription: '<path d="m12 3 9 6-9 12L3 9Zm-9 6h18M8 3l4 18 4-18"/>',
+    settings: '<path d="M4 7h16M4 17h16"/><circle cx="8" cy="7" r="3"/><circle cx="16" cy="17" r="3"/>',
+    support: '<path d="M4 13v-1a8 8 0 0 1 16 0v5a4 4 0 0 1-4 4h-3M4 11H2v7h4v-7Zm16 0h2v7h-4v-7Z"/>',
+    lesson: '<path d="M12 5C9 3 5 3 2 4v15c4-1 7 0 10 2 3-2 6-3 10-2V4c-3-1-7-1-10 1Zm0 0v16"/>',
+    practice: '<path d="M8 8h8M8 12h5M21 4v12a2 2 0 0 1-2 2H8l-5 4V4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/>',
+    login: '<rect x="5" y="2" width="14" height="20" rx="3"/><path d="M10 18h4M9 6h6"/>',
+    privacy: '<path d="m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6Zm-4 9 3 3 5-6"/>',
+    complete: '<path d="m4 12 5 5L20 6"/><circle cx="12" cy="12" r="10"/>'
+  };
+  const icon = name => `<svg class="ui-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${iconPaths[name] || iconPaths.lesson}</svg>`;
+  const visualGroups = {
+    onboarding:['01','شروع از خودت','START YOUR FLOW','roadmap'], login:['02','یه شروع ساده','WELCOME TO YOUR SPACE','login'], verify:['03','ورود به مسیر','ONE STEP CLOSER','privacy'],
+    dashboard:['01','فضای یادگیری تو','YOUR DAILY FLOW','dashboard'], roadmap:['02','نقشهٔ راه تو','THE BIG PICTURE','roadmap'], lesson:['03','از فهمیدن تا گفتن','LEARN IT. USE IT.','lesson'], practice:['04','فضای تمرین تو','FIND YOUR VOICE','practice'], analysis:['05','یک قدم بهتر','SMALL STEPS. REAL CHANGE.','progress'], review:['06','دوباره به یاد بیار','MAKE IT STICK','review'], progress:['07','قدم‌های خودت','YOUR JOURNEY SO FAR','progress'],
+    subscription:['08','انتخاب همراه مسیر','CHOOSE YOUR PACE','subscription'], checkout:['09','روشن و بدون ابهام','BEFORE YOU CONTINUE','subscription'], payment:['10','وضعیت سفارش تو','YOUR ORDER STATUS','privacy'], parent:['11','همراهِ یادگیری','SUPPORT THEIR JOURNEY','privacy'], assessment:['12','وقت به‌کاربردنه','PUT IT INTO PRACTICE','lesson'], result:['13','بازخورد برای ادامه','YOUR NEXT CHAPTER','progress'], settings:['14','متناسب با روز تو','MAKE IT YOURS','settings'], support:['15','تنها نمی‌مونی','HERE TO HELP','support'], privacy:['16','انتخاب با خودته','YOUR SPACE. YOUR CHOICE.','privacy'], completion:['17','مسیرت رو ببین','LOOK HOW FAR YOU CAME','complete']
+  };
   const landing = $('#main');
   const shell = document.createElement('div');
   shell.id = 'product-app'; shell.hidden = true;
@@ -25,7 +46,10 @@
   const action = (label, name, cls = 'navy', attrs = '') => `<button type="${name.startsWith('submit-') ? 'submit' : 'button'}" class="button ${cls}" data-action="${name}" ${attrs}>${label}</button>`;
   const link = (label, route, cls = 'navy') => `<a class="button ${cls}" href="#/${route}">${label}</a>`;
   const note = (text, cls = '') => `<div class="app-note ${cls}">${text}</div>`;
-  const head = (title, subtitle = '', extra = '') => `<div class="page-head"><div><h1 class="app-page-title" tabindex="-1">${title}</h1><p>${subtitle}</p></div>${extra}</div>`;
+  const head = (title, subtitle = '', extra = '') => {
+    const [number, label, english, symbol] = visualGroups[screen];
+    return `<div class="page-head"><div class="page-heading-copy"><div class="page-caption"><span class="page-number en">${number}</span><span>${label}</span></div><h1 class="app-page-title" tabindex="-1">${title}</h1><p>${subtitle}</p><span class="page-english en">${english}</span></div><div class="page-emblem" aria-hidden="true">${icon(symbol)}<span class="emblem-dot"></span></div>${extra}</div>`;
+  };
   const empty = (title, text, button = '') => `<div class="app-empty"><span class="empty-symbol" aria-hidden="true">◎</span><h2>${title}</h2><p>${text}</p>${button}</div>`;
   const stageName = n => C.stages[n];
   const topicFor = id => C.topics[id.split(':')[1]];
@@ -52,6 +76,7 @@
     return `${head(count ? 'خوش برگشتی؛ از همین‌جا ادامه بده.' : 'سلام، به مسیر خودت خوش اومدی.','یه قدم کوچک، بعد یه فرصت برای استفاده از چیزی که یاد گرفتی.')}
       <div class="app-grid"><div class="app-card dark"><div class="eyebrow">${stageName(state.stage)} · قدم بعدی تو</div><h2>${state.session ? 'تمرینت نیمه‌تموم مونده.' : C.topics[nextTopic].title}</h2><p>${state.session ? 'چیزی پاک نشده؛ می‌تونی از همون قدم ادامه بدی.' : C.topics[nextTopic].context}</p><div class="app-actions">${state.session ? action('ادامهٔ جلسه','resume') : action('شروع درس کوتاه','start','',`data-topic="${nextTopic}" data-stage="${state.stage}"`)}${link('دیدن کل مسیر','roadmap','outline')}</div></div><div class="app-card"><span class="app-kicker">REVIEW / TODAY</span><h2 style="margin-top:12px">${due.length ? 'وقتشه دوباره به کارش ببری.' : count ? 'مرورها برای نوبت بعد آماده‌ان.' : 'با اولین درس، مرور هم شروع می‌شه.'}</h2><p>${due.length ? `${due.length} عبارت برای مرور داری؛ بدون برگشتن به اول مسیر ادامه بده.` : 'بعد از یادگیری، عبارت‌ها رو با فاصله دوباره به یاد میاری.'}</p><div class="app-actions">${link('رفتن به مرور','review','outline')}</div></div></div>
       <div class="app-grid three" style="margin-top:20px"><div class="app-card"><div class="app-label">جلسه‌های تکمیل‌شده</div><span class="app-metric">${count.toLocaleString('fa-IR')}</span><p>فقط فعالیت‌های همین نمونه</p></div><div class="app-card"><div class="app-label">عبارت‌های مرورشده</div><span class="app-metric">${state.reviewed.length.toLocaleString('fa-IR')}</span><p>تعداد عبارت‌هایی که دوباره بازیابی کردی</p></div><div class="app-card"><div class="app-label">هدف روزانه</div><span class="app-metric">${Number(state.preferences.minutes).toLocaleString('fa-IR')} <small style="font-size:13px">دقیقه</small></span><a class="app-subtle-link" href="#/settings">تغییر هدف و یادآوری</a></div></div>
+      <div class="journey-panel"><div class="journey-heading"><div><span class="app-kicker">YOUR NINE-MONTH JOURNEY</span><h2>قدم‌هات کنار هم، مسیر می‌سازن.</h2></div>${link('نقشهٔ کامل مسیر','roadmap','outline')}</div><div class="journey-stages">${C.stages.map((name,i)=>`<div class="journey-stage ${i===state.stage?'is-current':''}"><div class="app-row"><strong class="en">${name}</strong><span>${['ماه ۱–۳','ماه ۴–۶','ماه ۷–۹'][i]}</span></div><div class="journey-nodes" aria-label="${name}، ${state.completed.filter(id=>id.startsWith(i+':')).length} از سه سناریوی نمونه تکمیل شده">${Object.keys(C.topics).map((topic,j)=>`<span class="journey-node ${state.completed.includes(C.lessonId(i,topic))?'is-done':''}">${state.completed.includes(C.lessonId(i,topic))?'✓':String(j+1).padStart(2,'0')}</span>`).join('')}</div></div>`).join('')}</div></div>
       ${due.length && state.preferences.reminder ? note('وقتشه چیزی که یاد گرفتی رو دوباره به کار ببری؛ مرورهای سررسیدشده منتظرتن.') : ''}
       ${!state.access.includes(0) ? note('در این نمونه، سه سناریوی رایگان Silver رو تجربه می‌کنی. تعداد جلسات رایگان محصول نهایی هنوز قطعی نیست.','warning') : ''}`;
   }
@@ -134,8 +159,12 @@
     const publicPages=['onboarding','login','verify','privacy','parent','support'];
     if(!signedIn&&!publicPages.includes(route)){destination=route;authMode='login';go('login');return;}
     landing.hidden=true;shell.hidden=false;document.body.classList.add('in-app');
+    screen=route;
+    shell.setAttribute('data-screen',route);
     document.title=labels[route]+' | SpeakFlow';
-    shell.innerHTML=`<div class="app-layout"><aside class="app-sidebar"><div class="sidebar-caption">فضای یادگیری تو</div>${navItems.map(([r,i,t])=>`<a href="#/${r}" ${r===route?'aria-current="page"':''}><span aria-hidden="true">${i}</span>${t}</a>`).join('')}<div class="sidebar-bottom"><b>${stageName(state.stage)} · ${state.access.length?state.plan:'تجربهٔ رایگان'}</b><p>زبان رو جوری که واقعا هست یادبگیر.</p><a class="app-subtle-link" href="#">بازگشت به لندینگ</a></div></aside><main class="app-workspace" id="app-main"><div class="app-topline"><span>SpeakFlow / ${labels[route]}</span><span class="pill">پروتوتایپ تعاملی · بدون پرداخت و AI زنده</span></div>${pages[route]()}</main></div><nav class="app-footer-nav" aria-label="منوی فضای یادگیری">${navItems.filter(([r])=>['dashboard','roadmap','review','progress','settings'].includes(r)).map(([r,i,t])=>`<a href="#/${r}" ${r===route?'aria-current="page"':''}><span aria-hidden="true">${i}</span>${t}</a>`).join('')}</nav>`;
+    const pageContent=pages[route]();
+    const content=pageContent.includes('app-page-title')?pageContent:head(labels[route],'قدم بعدی رو از همین‌جا انتخاب کن.')+pageContent;
+    shell.innerHTML=`<div class="app-layout"><aside class="app-sidebar"><div class="sidebar-caption"><span class="sidebar-monogram en" aria-hidden="true">sf.</span><span>فضای یادگیری تو<small class="en">LET'S GET TALKING</small></span></div>${navItems.map(([r,i,t])=>`<a href="#/${r}" ${r===route?'aria-current="page"':''}><span class="nav-icon">${icon(r)}</span>${t}</a>`).join('')}<div class="sidebar-bottom"><b>${stageName(state.stage)} · ${state.access.length?state.plan:'تجربهٔ رایگان'}</b><p>زبان رو جوری که واقعا هست یادبگیر.</p><a class="app-subtle-link" href="#">بازگشت به لندینگ</a></div></aside><main class="app-workspace" id="app-main"><div class="app-topline"><span>SpeakFlow / ${labels[route]}</span><span class="pill">پروتوتایپ تعاملی · بدون پرداخت و AI زنده</span></div>${content}</main></div><nav class="app-footer-nav" aria-label="منوی فضای یادگیری">${navItems.filter(([r])=>['dashboard','roadmap','review','progress','settings'].includes(r)).map(([r,i,t])=>`<a href="#/${r}" ${r===route?'aria-current="page"':''}><span class="nav-icon">${icon(r)}</span>${t}</a>`).join('')}</nav>`;
     shell.querySelector('.app-page-title')?.focus({preventScroll:true});
     window.scrollTo(0,0);
     bindForms();

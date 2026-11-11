@@ -212,6 +212,35 @@ test('prepaid later stages cannot skip Silver and incomplete selections stay uns
   assert.equal(a.state().session.step, 'practice');
 });
 
+test('every product page has its own visual identity and accessible heading', () => {
+  const a = setup(); a.signIn();
+  for (const route of Object.keys(a.pages)) {
+    a.route(route);
+    assert.match(a.output(), /class="page-caption"/);
+    assert.match(a.output(), /class="app-page-title" tabindex="-1"/);
+    assert.match(a.output(), /class="page-emblem" aria-hidden="true"/);
+    assert.match(a.output(), /class="ui-icon"/);
+    assert.doesNotMatch(a.output(), /undefined|null/);
+  }
+});
+
+test('journey illustration uses completed sessions instead of fabricated metrics', () => {
+  const s = C.initial(); complete(s, 0, 'cafe'); complete(s, 0, 'film');
+  const a = setup(s); a.signIn(); a.route('dashboard');
+  assert.equal([...a.output().matchAll(/class="journey-node /g)].length, 9);
+  assert.equal([...a.output().matchAll(/class="journey-node is-done"/g)].length, 2);
+  assert.match(a.output(), /Silver، 2 از سه سناریوی نمونه تکمیل شده/);
+});
+
+test('visual system covers desktop, small screens, reduced motion and print', () => {
+  const css = fs.readFileSync(`${__dirname}/app.css`, 'utf8');
+  for (const selector of ['.hero', '.app-sidebar', '.app-stepper', '.app-choice', '.journey-panel', '.video-slot', '.app-summary', '.app-footer-nav']) assert.ok(css.includes(selector));
+  assert.match(css, /prefers-reduced-motion:reduce/);
+  assert.match(css, /max-width:380px/);
+  assert.match(css, /#product-app\[data-screen=review\]/);
+  assert.match(css, /@media print/);
+});
+
 test('no personal data collection, network submission, fake microphone or external automation', () => {
   assert.doesNotMatch(appSource, /fetch\(|XMLHttpRequest|getUserMedia|MediaRecorder|type="password"|type="tel"/);
   assert.doesNotMatch(fs.readFileSync(`${__dirname}/app.css`, 'utf8'), /url\(/);
