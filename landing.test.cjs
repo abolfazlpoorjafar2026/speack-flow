@@ -52,9 +52,9 @@ test('landing retains brand, slogan and real internal anchors; obsolete dialog r
   for (const file of ['app.js', 'flow.js', 'app.css']) assert.ok(html.includes(file));
 });
 
-test('all twenty product routes render; links, actions and IDs resolve', () => {
+test('all twenty-two product routes render; links, actions and IDs resolve', () => {
   const a = setup(); a.signIn();
-  assert.equal(Object.keys(a.pages).length, 20);
+  assert.equal(Object.keys(a.pages).length, 22);
   for (const route of Object.keys(a.pages)) {
     a.route(route);
     const output = a.output();
@@ -239,6 +239,38 @@ test('visual system covers desktop, small screens, reduced motion and print', ()
   assert.match(css, /max-width:380px/);
   assert.match(css, /#product-app\[data-screen=review\]/);
   assert.match(css, /@media print/);
+});
+
+test('nine-month map has nine actionable stops and preserves access guards', () => {
+  const a = setup(); a.route('roadmap');
+  assert.match(a.output(), /سفر نُه/);
+  assert.equal([...a.output().matchAll(/class="map-stop"/g)].length, 9);
+  assert.equal([...a.output().matchAll(/class="map-node ready"/g)].length, 3);
+  assert.equal([...a.output().matchAll(/class="map-node locked"/g)].length, 6);
+});
+
+test('prices agree between landing, plans, checkout and parent view', () => {
+  assert.deepEqual(C.prices, { Basic: 2600000, Medium: 3950000, Pro: 5500000 });
+  const a = setup(); a.signIn();
+  for (const [plan, price] of Object.entries(C.prices)) {
+    const formatted = price.toLocaleString('fa-IR');
+    assert.ok(html.includes(formatted));
+    a.route('subscription'); assert.ok(a.output().includes(formatted));
+    a.click('choose-plan', { plan }); a.route('checkout');
+    assert.ok(a.output().includes(formatted));
+    a.route('parent'); assert.ok(a.output().includes(formatted));
+  }
+});
+
+test('profile XP and badges cannot be farmed by repeating completed activities', () => {
+  const s = C.initial(); assert.equal(C.activityXP(s), 0);
+  complete(s, 0, 'cafe'); complete(s, 0, 'cafe');
+  C.review(s, '0:cafe', true); C.review(s, '0:cafe', true);
+  assert.equal(C.activityXP(s), 40);
+  assert.deepEqual(C.milestones(s), [true, true, false]);
+  const a = setup(s); a.signIn(); a.route('profile');
+  assert.match(a.output(), /نمودار قدم‌های تو/);
+  assert.equal([...a.output().matchAll(/class="earned-badge earned"/g)].length, 2);
 });
 
 test('no personal data collection, network submission, fake microphone or external automation', () => {

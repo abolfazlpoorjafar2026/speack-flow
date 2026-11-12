@@ -1,5 +1,8 @@
 (function (root) {
   const stages = ['Silver', 'Gold', 'Diamond'];
+  const prices = { Basic: 2600000, Medium: 3950000, Pro: 5500000 };
+  const activityXP = s => s.completed.length * 30 + s.reviewed.length * 10;
+  const milestones = s => [s.completed.length > 0, s.reviewed.length > 0, s.completed.filter(id => id.startsWith('0:')).length === 3];
   const topics = {
     cafe: { title: 'سفارش توی کافه', context: 'یه قهوه می‌خوای؛ با یه درخواست مؤدبانه شروع کن.', phrase: "I'd like a coffee, please.", meaning: 'یه قهوه می‌خواستم، لطفاً.', question: 'Hi! What would you like to drink?', wrong: 'Give me coffee.', tip: '«I’d like» یه راه مؤدبانه برای بیان خواسته‌ست.' },
     film: { title: 'حرف‌زدن دربارهٔ فیلم', context: 'فیلم تموم شده؛ حالا نظرت رو به دوستت بگو.', phrase: 'I really enjoyed it.', meaning: 'واقعاً ازش لذت بردم.', question: 'What did you think of the movie?', wrong: 'I enjoy it yesterday.', tip: '«Enjoyed» برای تجربه‌ایه که در گذشته داشتی.' },
@@ -65,7 +68,7 @@
     if (status === 'success') { if (!s.access.includes(s.order.stage)) s.access.push(s.order.stage); s.plan = s.order.plan; }
     return true;
   }
-  const api = { stages, topics, initial, restore, lessonId, due, canStart, start, finish, review, assess, advance, payment };
+  const api = { stages, prices, activityXP, milestones, topics, initial, restore, lessonId, due, canStart, start, finish, review, assess, advance, payment };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SFCore = api;
 })(typeof globalThis === 'undefined' ? this : globalThis);
