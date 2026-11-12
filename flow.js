@@ -64,6 +64,7 @@
   }
   function payment(s, status) {
     if (!s.order || !['success', 'failed', 'pending', 'cancelled'].includes(status)) return false;
+    if (s.order.status === 'success') return status === 'success';
     s.order.status = status;
     if (status === 'success') { if (!s.access.includes(s.order.stage)) s.access.push(s.order.stage); s.plan = s.order.plan; }
     return true;

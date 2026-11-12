@@ -273,6 +273,32 @@ test('profile XP and badges cannot be farmed by repeating completed activities',
   assert.equal([...a.output().matchAll(/class="earned-badge earned"/g)].length, 2);
 });
 
+test('confirmed payment cannot regress to failed or pending', () => {
+  const s = C.initial(); s.order = { stage: 0, plan: 'Pro', status: 'preview' };
+  C.payment(s, 'success');
+  for (const status of ['failed', 'pending', 'cancelled']) assert.equal(C.payment(s, status), false);
+  assert.equal(s.order.status, 'success');
+  assert.deepEqual(s.access, [0]);
+});
+
+test('next-stage assessment requires a fresh answer after either advancement path', () => {
+  for (const purchase of [false, true]) {
+    const s = C.initial(); s.access = [0, 1];
+    for (const topic of Object.keys(C.topics)) complete(s, 0, topic);
+    const a = setup(s); a.signIn(); a.route('assessment');
+    a.click('assessment-choice', { choice: 'correct' });
+    a.click('assessment-submit');
+    if (purchase) {
+      a.state().order = { stage: 1, plan: 'Basic', status: 'success' };
+      a.click('after-purchase');
+    } else a.click('advance');
+    for (const topic of Object.keys(C.topics)) complete(a.state(), 1, topic);
+    a.route('assessment'); a.click('assessment-submit');
+    assert.equal(a.state().assessment, null);
+    assert.match(a.elements.get('#assessment-feedback').innerHTML, /اول یه پاسخ انتخاب کن/);
+  }
+});
+
 test('no personal data collection, network submission, fake microphone or external automation', () => {
   assert.doesNotMatch(appSource, /fetch\(|XMLHttpRequest|getUserMedia|MediaRecorder|type="password"|type="tel"/);
   assert.doesNotMatch(fs.readFileSync(`${__dirname}/app.css`, 'utf8'), /url\(/);
