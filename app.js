@@ -7,6 +7,7 @@
   let signedIn = false;
   let authMode = 'signup';
   let authStatus = '';
+  let authProfile = { name: '', phone: '' };
   let destination = 'dashboard';
   let reviewId = null;
   let reviewReady = false;
@@ -65,6 +66,7 @@
   const steps = step => `<div class="app-stepper" aria-label="مراحل درس">${['فهم جمله','بازیابی تایپی','تکرار گفتاری','کاربرد در موقعیت'].map((t,i)=>`<span class="${step === i ? 'active' : ''}">${i+1}. ${t}</span>`).join('')}</div>`;
   const buddyScene = (title, copy, mood = 'ready') => `<div class="buddy-scene buddy-${mood}"><div class="buddy-orbit orbit-one"></div><div class="buddy-orbit orbit-two"></div><img src="buddy.svg" alt="رفیق، همراه مسیر یادگیری" width="150" height="169"><div class="buddy-card"><strong>${title}</strong><span>${copy}</span></div></div>`;
   const money = value => value.toLocaleString('fa-IR');
+  const faDigits = value => String(value).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
   function gameMap() {
     return `<section class="game-map" aria-label="نقشهٔ ۹ماههٔ سفر نُه"><div class="map-guide"><img src="buddy.svg" width="110" height="124" alt="رفیق، همراه سفر نُه"><div><h2>۹ ماه، ۳ سرزمین، کلی فرصت برای گفتن.</h2><p>هر ماه یه ایستگاه؛ درس‌ها و مرورها قدم‌های کوچیک بین ایستگاه‌هان.</p></div></div><div class="map-worlds">${C.stages.map((name,i)=>`<article class="map-world"><h3><span class="en">${name}</span><span>سرزمین ${i+1}</span></h3><div class="map-track">${Object.keys(C.topics).map((topic,j)=>{const done=state.completed.includes(C.lessonId(i,topic));const accessible=C.canStart(state,i,topic);return `<div class="map-stop"><button class="map-node ${done?'done':accessible?'ready':'locked'}" data-action="${accessible?'start':'view-stage'}" data-stage="${i}" data-topic="${topic}" aria-label="ماه ${i*3+j+1}؛ ${C.topics[topic].title}${done?'، تمرین نمونه تکمیل شده':''}">${done?'✓':i*3+j+1}</button><strong>ماه ${(i*3+j+1).toLocaleString('fa-IR')}</strong><span>${C.topics[topic].title}</span></div>`;}).join('')}</div><div class="map-finish">${icon('subscription')} ارزیابی پایان ${name}</div></article>`).join('')}</div><p class="map-disclaimer">۹ ایستگاه، نمایش ساختار زمانی مسیر است؛ هر ایستگاه فعلاً یک سناریوی نمونه دارد، نه محتوای کامل یک ماه.</p></section>`;
   }
@@ -82,10 +84,68 @@
     return `<div class="app-narrow">${head('مسیرت رو به خودت نزدیک کن.','سه سؤال کوتاه؛ همه از Silver شروع می‌کنیم.')}<div class="onboarding-buddy">${buddyScene('رفیق آماده‌ست!','با یه قدم کوچیک شروع می‌کنیم.','hello')}</div><form id="onboarding-form" class="app-card">${goalField()}${experienceField()}${interestField()}<div class="app-actions">${action('ادامه و ساخت حساب نمونه','submit-onboarding')}</div><div class="app-form-footer">پاسخ‌ها روی همین مرورگر می‌مونن. این سؤال‌ها تعیین سطح نیستن.</div></form></div>`;
   }
   function login() {
-    return `<div class="app-narrow">${head(authMode === 'login' ? 'خوش برگشتی.' : 'اولین قدم، یه شروع ساده.','بعد از تأیید شماره، مستقیم به قدم بعدی برمی‌گردی.')}<div class="app-card"><div class="app-label">نمای حساب و شمارهٔ نمونه</div><div class="app-phone">09•• ••• ••21</div><p>این صفحه طرح ورود با شماره و کده. برای دیدن مسیر، از حساب نمایشی استفاده کن؛ نیازی به شمارهٔ واقعی نیست.</p><label class="app-check"><input type="checkbox" id="privacy-consent"> <span>توضیح <a class="app-subtle-link" href="#/privacy">حریم خصوصی</a> و نمایشی‌بودن ورود رو خوندم.</span></label><p id="auth-feedback" role="status" class="app-label"></p><div class="app-actions">${action('دیدن مرحلهٔ کد','request-code')}${action(authMode === 'login' ? 'تازه واردی؟ شروع مسیر' : 'قبلاً اومدی؟ ورود','toggle-auth','outline')}</div></div></div>`;
+    const nameBlock = authMode === 'login'
+      ? `<p class="auth-hint">با شمارهٔ موبایل و کد پیامکی وارد حساب خود شوید.</p>`
+      : `<div class="auth-row">
+           <label class="auth-field"><span>نام</span><input name="firstName" required maxlength="40" autocomplete="given-name" placeholder="مثلاً ابوالفضل"></label>
+           <label class="auth-field"><span>نام خانوادگی</span><input name="lastName" required maxlength="40" autocomplete="family-name" placeholder="مثلاً پورجعفر"></label>
+         </div>`;
+    return `<div class="auth-page">
+      <div class="auth-panel">
+        <div class="auth-panel-head">
+          <span class="auth-kicker">SpeakFlow</span>
+          <h1 class="app-page-title" tabindex="-1">${authMode === 'login' ? 'ورود به حساب کاربری' : 'ساخت حساب کاربری'}</h1>
+          <p>${authMode === 'login' ? 'برای ادامهٔ مسیر یادگیری، اطلاعات حساب خود را وارد کنید.' : 'اطلاعات خود را وارد کنید تا مسیر یادگیری شما ساخته شود.'}</p>
+        </div>
+        <form id="login-form" class="auth-form" novalidate>
+          ${nameBlock}
+          <label class="auth-field auth-phone-field"><span>شمارهٔ موبایل</span>
+            <input id="auth-phone" name="phone" type="tel" inputmode="numeric" dir="ltr" lang="en" autocomplete="tel-national" maxlength="11" required placeholder="09xxxxxxxxx">
+            <small>کد تأیید به همین شماره پیامک می‌شود. در این نسخهٔ نمایشی ارسال نمی‌شود.</small>
+          </label>
+          <div id="login-error" class="auth-error" role="status" hidden></div>
+          <button class="button navy auth-submit" type="submit">${authMode === 'login' ? 'دریافت کد ورود' : 'دریافت کد تأیید'} <span aria-hidden="true">←</span></button>
+        </form>
+        <p class="auth-switch">${authMode === 'login' ? 'حساب ندارید؟ <button type="button" class="auth-link" data-action="toggle-auth">ساخت حساب جدید</button>' : 'قبلاً حساب ساخته‌اید؟ <button type="button" class="auth-link" data-action="toggle-auth">ورود به حساب</button>'}</p>
+        <div class="auth-legal">
+          <label class="app-check"><input type="checkbox" id="privacy-consent"> <span>با <a class="app-subtle-link" href="#/privacy">شرایط استفاده و حریم خصوصی</a> موافقم و می‌دانم این نسخه نمایشی است.</span></label>
+        </div>
+        <p class="auth-demo"><button type="button" class="auth-link" data-action="demo-login">ورود با حساب نمایشی، بدون شماره</button></p>
+      </div>
+      <aside class="auth-aside">
+        <img src="buddy.svg" width="112" height="126" alt="" class="auth-aside-mark">
+        <h2>زبان را برای استفاده یاد بگیرید.</h2>
+        <p>درس کوتاه، تمرین مکالمه و مرور هدفمند در یک مسیر نُه‌ماهه با ساختار روشن.</p>
+        <ul class="auth-points">
+          <li>مسیر سه‌مرحله‌ای Silver، Gold و Diamond</li>
+          <li>تمرین مکالمه در موقعیت‌های واقعی</li>
+          <li>مرور فاصله‌دار برای تثبیت آموخته‌ها</li>
+        </ul>
+        <p class="auth-aside-foot">SpeakFlow · آموزش کاربردی زبان انگلیسی</p>
+      </aside>
+    </div>`;
   }
   function verify() {
-    return `<div class="app-narrow">${head('تأیید شماره','در محصول نهایی، کد پیامکی اینجا وارد می‌شه.')}<div class="app-card"><div class="app-label">شمارهٔ نمونه: <bdi>09•• ••• ••21</bdi></div><div class="app-phone" aria-label="محل ورود کد نمونه">— — — — — —</div>${note('در این پروتوتایپ پیامکی ارسال نمی‌شه. دکمهٔ پایین، تأیید نمایشی رو انجام می‌ده.')}<div id="verify-status" role="status">${authStatus ? note(esc(authStatus),'warning') : ''}</div><div class="app-actions">${action('ادامه با حساب نمایشی','verify')}${link('ویرایش شماره / برگشت','login','outline')}</div><details class="app-demo-controls"><summary>حالت‌های کد ورود</summary>${action('کد اشتباه','code-wrong','outline')}${action('کد منقضی','code-expired','outline')}${action('ارسال دوبارهٔ نمایشی','code-resend','outline')}</details></div></div>`;
+    const who = authProfile.name ? `<b>${esc(authProfile.name)}</b> · ` : '';
+    return `<div class="auth-page auth-page-single">
+      <div class="auth-panel">
+        <div class="auth-panel-head">
+          <span class="auth-kicker">تأیید شماره</span>
+          <h1 class="app-page-title" tabindex="-1">کد تأیید را وارد کنید</h1>
+          <p>${who}کد شش‌رقمی به شمارهٔ <bdi>${esc(faDigits(authProfile.phone) || 'شمارهٔ شما')}</bdi> ارسال شد.</p>
+        </div>
+        <form id="verify-form" class="auth-form" novalidate>
+          <label class="auth-field auth-code-field"><span>کد تأیید</span>
+            <input id="auth-code" name="code" type="text" inputmode="numeric" dir="ltr" lang="en" autocomplete="one-time-code" maxlength="6" required placeholder="- - - - - -">
+            <small>در این نسخهٔ نمایشی پیامکی ارسال نمی‌شود؛ برای ادامه، دکمهٔ تأیید نمایشی را بزنید.</small>
+          </label>
+          <div id="verify-status" role="status">${authStatus ? `<div class="auth-error">${esc(authStatus)}</div>` : ''}</div>
+          <button class="button navy auth-submit" type="submit">تأیید و ورود <span aria-hidden="true">←</span></button>
+        </form>
+        <p class="auth-switch"><button type="button" class="auth-link" data-action="edit-phone">ویرایش شماره یا نام</button> · <button type="button" class="auth-link" data-action="code-resend">ارسال دوبارهٔ کد</button></p>
+        <details class="app-demo-controls"><summary>نمایش حالت‌های خطای کد (نمایشی)</summary>${action('کد اشتباه','code-wrong','outline')}${action('کد منقضی','code-expired','outline')}</details>
+      </div>
+    </div>`;
   }
   function dashboard() {
     const due = C.due(state); const count = state.completed.length;
@@ -181,7 +241,9 @@
     shell.setAttribute('data-screen',route);
     document.title=labels[route]+' | SpeakFlow';
     const pageContent=pages[route]();
+    const authLayout = route === 'login' || route === 'verify';
     const content=pageContent.includes('app-page-title')?pageContent:head(labels[route],'قدم بعدی رو از همین‌جا انتخاب کن.')+pageContent;
+    if(authLayout){shell.innerHTML=`<div class="auth-shell">${pageContent}</div>`;window.scrollTo(0,0);bindForms();return;}
     shell.innerHTML=`<div class="app-layout"><aside class="app-sidebar"><div class="sidebar-caption"><span class="sidebar-monogram en" aria-hidden="true">sf.</span><span>فضای یادگیری تو<small class="en">LET'S GET TALKING</small></span></div>${navItems.map(([r,i,t])=>`<a href="#/${r}" ${r===route?'aria-current="page"':''}><span class="nav-icon">${icon(r)}</span>${t}</a>`).join('')}<div class="sidebar-bottom"><b>${stageName(state.stage)} · ${state.access.length?state.plan:'تجربهٔ رایگان'}</b><p>زبان رو جوری که واقعا هست یادبگیر.</p><a class="app-subtle-link" href="#">بازگشت به لندینگ</a></div></aside><main class="app-workspace" id="app-main"><div class="app-topline"><span>SpeakFlow / ${labels[route]}</span><span class="pill">پروتوتایپ تعاملی · بدون پرداخت و AI زنده</span></div>${content}<footer class="product-footer"><strong>SpeakFlow · هر قدم، یه فرصت برای گفتن</strong><div><a href="#/roadmap">سفر نُه</a><a href="#/profile">پروفایل من</a><a href="#/founder">بنیان‌گذار</a><a href="#/support">پشتیبانی</a></div></footer></main></div><nav class="app-footer-nav" aria-label="منوی فضای یادگیری">${navItems.filter(([r])=>['dashboard','roadmap','review','progress','settings'].includes(r)).map(([r,i,t])=>`<a href="#/${r}" ${r===route?'aria-current="page"':''}><span class="nav-icon">${icon(r)}</span>${t}</a>`).join('')}</nav>`;
     shell.querySelector('.app-page-title')?.focus({preventScroll:true});
     window.scrollTo(0,0);
@@ -189,6 +251,31 @@
   }
   function normalize(text) {return text.trim().toLowerCase().replace(/[’‘]/g,"'").replace(/[.,!?]/g,'').replace(/\s+/g,' ');}
   function bindForms(){
+    const loginForm = $('#login-form');
+    loginForm?.addEventListener('submit', event => {
+      event.preventDefault();
+      const data = new FormData(event.target);
+      const first = String(data.get('firstName') || '').trim();
+      const last = String(data.get('lastName') || '').trim();
+      const phone = String(data.get('phone') || '').replace(/[^0-9]/g, '');
+      const error = $('#login-error');
+      const show = message => { if (error) { error.textContent = message; error.hidden = false; error.focus?.(); } };
+      if (authMode !== 'login' && (!first || !last)) return show('نام و نام خانوادگی را کامل وارد کنید.');
+      if (authMode !== 'login' && (first.length < 2 || last.length < 2)) return show('نام و نام خانوادگی باید دست‌کم دو حرف باشند.');
+      if (!/^09[0-9]{9}$/.test(phone)) return show('شمارهٔ موبایل باید با ۰۹ شروع شود و ۱۱ رقم باشد.');
+      if (!$('#privacy-consent')?.checked) return show('برای ادامه، شرایط استفاده و حریم خصوصی را تأیید کنید.');
+      if (error) error.hidden = true;
+      authProfile = { name: authMode === 'login' ? '' : `${first} ${last}`.trim(), phone };
+      authStatus = '';
+      go('verify');
+    });
+    const verifyForm = $('#verify-form');
+    verifyForm?.addEventListener('submit', event => {
+      event.preventDefault();
+      const code = String(new FormData(event.target).get('code') || '').replace(/[^0-9]/g, '');
+      if (code && code.length !== 6) { authStatus = 'کد باید شش رقم باشد.'; render(); return; }
+      signedIn = true; save(); go(destination);
+    });
     $('#onboarding-form')?.addEventListener('change',event=>{if(['goal','experience','interest'].includes(event.target.name)){state.preferences[event.target.name]=event.target.value;save();}});
     $('#onboarding-form')?.addEventListener('submit',event=>{event.preventDefault();const d=new FormData(event.target);for(const key of ['goal','experience','interest'])state.preferences[key]=d.get(key);save();authMode='signup';destination='dashboard';go('login');});
     $('#settings-form')?.addEventListener('submit',event=>{event.preventDefault();const d=new FormData(event.target);for(const key of ['goal','interest','minutes'])state.preferences[key]=d.get(key);state.preferences.reminder=d.has('reminder');save();$('#settings-feedback').innerHTML=note('ترجیح‌هات در همین مرورگر ذخیره شد.','success');});
@@ -198,9 +285,9 @@
   }
   const handlers={
     'submit-onboarding':()=>{},'submit-settings':()=>{},'submit-recall':()=>{},'submit-support':()=>{},
-    'toggle-auth':()=>{authMode=authMode==='login'?'signup':'login';if(authMode==='signup')go('onboarding');else render();},
-    'request-code':()=>{if(!$('#privacy-consent').checked){$('#auth-feedback').textContent='برای ادامه، توضیح حریم خصوصی رو تأیید کن.';return;}authStatus='';go('verify');},
-    verify:()=>{signedIn=true;save();go(destination);},
+    'toggle-auth':()=>{authMode=authMode==='login'?'signup':'login';authStatus='';render();},
+    'demo-login':()=>{authProfile={name:'حساب نمایشی',phone:''};signedIn=true;save();go(destination);},
+    'edit-phone':()=>{authStatus='';go('login');},
     'code-wrong':()=>{authStatus='کد واردشده درست نیست. در نسخهٔ واقعی، می‌تونی اصلاحش کنی یا بعد از مهلت دوباره درخواست بدی.';render();},
     'code-expired':()=>{authStatus='مهلت کد تموم شده؛ کد تازه درخواست کن.';render();},
     'code-resend':()=>{authStatus='حالت ارسال مجدد نمایش داده شد؛ هیچ پیامکی ارسال نشده.';render();},

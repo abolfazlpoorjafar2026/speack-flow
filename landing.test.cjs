@@ -70,8 +70,16 @@ test('all CTAs enter onboarding and protected deep links retain destination', ()
   const a = setup();
   for (const button of a.starts) { button.fire('click'); assert.equal(a.location.hash, '/onboarding'); }
   a.route('review'); assert.equal(a.location.hash, '/login');
-  a.route('login'); a.elements.get('#privacy-consent').checked = true;
-  a.click('request-code'); a.route('verify'); a.click('verify');
+  a.route('login');
+  const login = a.elements.get('#login-form');
+  login.values = { firstName: 'ابوالفضل', lastName: 'پورجعفر', phone: '09121234567' };
+  a.elements.get('#privacy-consent').checked = true;
+  login.fire('submit', { target: login });
+  assert.equal(a.location.hash, '/verify');
+  a.route('verify');
+  const verify = a.elements.get('#verify-form');
+  verify.values = { code: '123456' };
+  verify.fire('submit', { target: verify });
   assert.equal(a.location.hash, '/review');
 });
 
@@ -85,12 +93,50 @@ test('onboarding preserves known selections and does not change learning stage',
   assert.equal(a.location.hash, '/login');
 });
 
-test('consent, wrong code, expiry and resend are explicit demo states', () => {
-  const a = setup(); a.route('login'); a.click('request-code');
-  assert.match(a.elements.get('#auth-feedback').textContent, /تأیید/);
-  a.elements.get('#privacy-consent').checked = true; a.click('request-code');
-  assert.equal(a.location.hash, '/verify'); a.route('verify');
-  for (const name of ['code-wrong', 'code-expired', 'code-resend']) { a.click(name); assert.match(a.output(), /warning/); }
+test('login validates names, phone and consent before requesting a code', () => {
+  const a = setup(); a.route('login');
+  const form = a.elements.get('#login-form');
+  const submit = values => { form.values = values; form.fire('submit', { target: form }); };
+  a.elements.get('#privacy-consent').checked = true;
+  submit({ firstName: 'ا', lastName: 'پورجعفر', phone: '09121234567' });
+  assert.match(a.elements.get('#login-error').textContent, /نام و نام خانوادگی/);
+  submit({ firstName: 'ابوالفضل', lastName: 'پورجعفر', phone: '0812345' });
+  assert.match(a.elements.get('#login-error').textContent, /۰۹/);
+  a.elements.get('#privacy-consent').checked = false;
+  submit({ firstName: 'ابوالفضل', lastName: 'پورجعفر', phone: '09121234567' });
+  assert.match(a.elements.get('#login-error').textContent, /حریم خصوصی/);
+  assert.notEqual(a.location.hash, '/verify');
+  a.elements.get('#privacy-consent').checked = true;
+  submit({ firstName: 'ابوالفضل', lastName: 'پورجعفر', phone: '0912 123 4567' });
+  assert.equal(a.location.hash, '/verify');
+  assert.equal(a.state().preferences.interest, 'cafe');
+});
+
+test('verify rejects a short code and accepts demo login without phone', () => {
+  const a = setup(); a.route('login');
+  const login = a.elements.get('#login-form');
+  login.values = { firstName: 'سارا', lastName: 'احمدی', phone: '09351112233' };
+  a.elements.get('#privacy-consent').checked = true;
+  login.fire('submit', { target: login });
+  a.route('verify');
+  assert.match(a.output(), /سارا احمدی/);
+  assert.match(a.output(), /۰۹۳۵۱۱۱۲۲۳۳/);
+  const verify = a.elements.get('#verify-form');
+  verify.values = { code: '12' };
+  verify.fire('submit', { target: verify });
+  assert.match(a.output(), /شش رقم/);
+  const b = setup(); b.route('login');
+  b.click('demo-login');
+  assert.equal(b.location.hash, '/dashboard');
+});
+
+test('login page switches between signup and sign-in copy', () => {
+  const a = setup(); a.route('login');
+  assert.match(a.output(), /ساخت حساب کاربری/);
+  assert.match(a.output(), /نام خانوادگی/);
+  a.click('toggle-auth'); a.route('login');
+  assert.match(a.output(), /ورود به حساب کاربری/);
+  assert.doesNotMatch(a.output(), /نام خانوادگی/);
 });
 
 test('lesson four steps, incorrect recall, resumed session and network retry', () => {
@@ -216,6 +262,12 @@ test('every product page has its own visual identity and accessible heading', ()
   const a = setup(); a.signIn();
   for (const route of Object.keys(a.pages)) {
     a.route(route);
+    if (route === 'login' || route === 'verify') {
+      assert.match(a.output(), /class="auth-page/);
+      assert.match(a.output(), /class="app-page-title" tabindex="-1"/);
+      assert.doesNotMatch(a.output(), /undefined|null/);
+      continue;
+    }
     assert.match(a.output(), /class="page-caption"/);
     assert.match(a.output(), /class="app-page-title" tabindex="-1"/);
     assert.match(a.output(), /class="page-emblem" aria-hidden="true"/);
@@ -328,6 +380,7 @@ test('hero styling is scoped, responsive and motion-safe', () => {
 });
 
 test('no personal data collection, network submission, fake microphone or external automation', () => {
-  assert.doesNotMatch(appSource, /fetch\(|XMLHttpRequest|getUserMedia|MediaRecorder|type="password"|type="tel"/);
+  assert.doesNotMatch(appSource, /fetch\(|XMLHttpRequest|getUserMedia|MediaRecorder|type="password"/);
+  assert.doesNotMatch(appSource, /document\.cookie|sendBeacon|new WebSocket/);
   assert.doesNotMatch(fs.readFileSync(`${__dirname}/app.css`, 'utf8'), /url\(/);
 });
