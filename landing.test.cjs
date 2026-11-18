@@ -299,6 +299,34 @@ test('next-stage assessment requires a fresh answer after either advancement pat
   }
 });
 
+test('hero has one section boundary, a human mascot and no leftover egg mascot markup', () => {
+  const heroStart = html.indexOf('<section class="hero"');
+  const heroEnd = html.indexOf('<section class="strip"');
+  assert.ok(heroStart > -1 && heroEnd > heroStart);
+  const hero = html.slice(heroStart, heroEnd);
+  assert.match(hero, /id="hero"/);
+  assert.match(hero, /class="hero-character-art" src="buddy\.svg"/);
+  assert.match(hero, /class="hero-character-say"/);
+  assert.doesNotMatch(hero, /hero-buddy|floating-note|class="visual"/);
+  assert.equal((html.match(/<section class="hero"/g) || []).length, 1);
+  assert.match(html, /<section class="strip"/);
+  assert.doesNotMatch(html, /<div class="strip">/);
+  const svg = fs.readFileSync(`${__dirname}/buddy.svg`, 'utf8');
+  assert.match(svg, /viewBox="0 0 320 360"/);
+  assert.match(svg, /آدمک همراه/);
+  assert.match(svg, /<circle cx="160" cy="106" r="57"/);
+  assert.doesNotMatch(svg, /<rect x="80" y="114" width="170"/);
+});
+
+test('hero styling is scoped, responsive and motion-safe', () => {
+  const css = fs.readFileSync(`${__dirname}/app.css`, 'utf8');
+  const block = css.slice(css.indexOf('HERO v5'));
+  for (const selector of ['.hero-stage', '.hero-character-art', '.hero-character-say', '.hero-level-chip', '.hero-stage .practice-card']) assert.ok(block.includes(selector), selector);
+  assert.match(block, /@media\(max-width:760px\)/);
+  assert.match(block, /@media\(prefers-reduced-motion:reduce\)/);
+  assert.doesNotMatch(block, /position:absolute;bottom:-?\d+px/);
+});
+
 test('no personal data collection, network submission, fake microphone or external automation', () => {
   assert.doesNotMatch(appSource, /fetch\(|XMLHttpRequest|getUserMedia|MediaRecorder|type="password"|type="tel"/);
   assert.doesNotMatch(fs.readFileSync(`${__dirname}/app.css`, 'utf8'), /url\(/);
