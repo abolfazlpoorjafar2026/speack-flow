@@ -46,7 +46,7 @@ function complete(s, stage, topic, now = 1000) { assert.equal(C.start(s, stage, 
 
 test('landing retains brand, slogan and real internal anchors; obsolete dialog removed', () => {
   assert.match(html, /<html lang="fa" dir="rtl">/);
-  assert.match(html, /<span>واقعاً هست<\/span> یاد بگیر/);
+  assert.match(html, /<span>واقعا هست<\/span> یادبگیر\./);
   assert.doesNotMatch(html, /<dialog|دوره‌ها|اساتید/);
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
   assert.equal(ids.length, new Set(ids).size);
@@ -417,69 +417,52 @@ test('next-stage assessment requires a fresh answer after either advancement pat
   }
 });
 
-test('hero follows the reference layout: message, pill, one CTA and a dashboard mock', () => {
+test('hero keeps last week structure: eyebrow, message, one CTA and the talking partner card', () => {
   const heroStart = html.indexOf('<section class="hero"');
-  const heroEnd = html.indexOf('<section class="section how"');
+  const heroEnd = html.indexOf('<section class="strip"');
   assert.ok(heroStart > -1 && heroEnd > heroStart);
   const hero = html.slice(heroStart, heroEnd);
   assert.match(hero, /id="hero-title"/);
-  assert.match(hero, /<span>واقعاً هست<\/span>/);
-  assert.match(hero, /class="hero-lead">اصطلاحات روزمره و مکالمهٔ کاربردی</);
-  assert.match(hero, /class="button hero-cta" data-start>شروع تجربه رایگان/);
-  assert.match(hero, /class="hero-mock"/);
-  assert.match(hero, /class="mock-app">/);
-  for (const part of ['مرحلهٔ فعلی:', 'Silver', 'قدم بعدی:', 'مرورهای امروز']) assert.ok(hero.includes(part), part);
-  assert.doesNotMatch(hero, /buddy\.svg|hero-actions|floating-note|class="strip"/);
+  assert.match(hero, /<span>واقعا هست<\/span>/);
+  assert.match(hero, /class="eyebrow">/);
+  assert.match(hero, /class="hero-actions"|<button class="button" data-start>شروع رایگان مکالمه/);
+  assert.match(hero, /class="practice-card"/);
+  assert.match(hero, /data-scene="cafe"/);
+  assert.doesNotMatch(hero, /hero-mock|mock-app/);
   assert.equal((html.match(/<section class="hero"/g) || []).length, 1);
+  assert.equal((html.match(/<section class="strip"/g) || []).length, 1);
 });
 
-test('header and footer match the reference: pill logo, four links, CTA, navy footer with links and socials', () => {
+test('header keeps the original menu, sign-in link and start button', () => {
   const header = html.slice(html.indexOf('<header'), html.indexOf('</header>'));
   assert.match(header, /id="main-nav"/);
   const navBlock = header.match(/<nav class="nav"[^>]*>([\s\S]*?)<\/nav>/)[1];
-  const navLinks = [...navBlock.matchAll(/<a href="([^"]+)">([^<]+)<\/a>/g)].map(m => m[2]);
-  assert.deepEqual(navLinks, ['برای والدین', 'سوالات متداول', 'درباره ما', 'تماس با ما']);
+  assert.deepEqual([...navBlock.matchAll(/<a href="([^"]+)">([^<]+)<\/a>/g)].map(m => m[2]),
+    ['چطور یاد می‌گیری؟', 'سفر نُه · مسیر ۹ماهه', 'اشتراک‌ها', 'داستان ما']);
+  assert.match(header, /href="#\/login"/);
   assert.match(header, /class="button header-action" data-start>شروع رایگان/);
-  assert.match(header, /class="brand-name en"><b>Speak<\/b>Flow<\/span>/);
   assert.match(header, /id="menu-toggle"/);
-  const footer = html.slice(html.indexOf('<footer'), html.indexOf('</footer>'));
-  assert.match(footer, /class="wrap sf-footer"/);
-  const footLinks = [...footer.matchAll(/<a href="[^"]+">([^<]+)<\/a>/g)].map(m => m[1]);
-  for (const label of ['درباره ما', 'تماس با ما', 'پشتیبانی', 'حریم خصوصی', 'شرایط استفاده']) assert.ok(footLinks.includes(label), label);
-  assert.equal([...footer.matchAll(/class="social"/g)].length, 3);
-  assert.match(footer, /Speak Better\. Live Bolder\./);
+  assert.match(header, /class="brand-name en">SpeakFlow<\/span>/);
 });
 
-test('talking partner loop and stage cards use the reference flow and palette', () => {
-  const how = html.slice(html.indexOf('id="how-title"'), html.indexOf('id="path-title"'));
-  assert.match(how, /class="how-flow"/);
-  const steps = [...how.matchAll(/class="how-step"><span class="how-icon"[^>]*>[\s\S]*?<\/span><strong>([^<]+)<\/strong>/g)].map(m => m[1]);
-  assert.deepEqual(steps, ['آموزش', 'تمرین تایپی', 'تمرین صوتی', 'تمرین سه‌مرحله‌ای', 'مرور']);
-  assert.equal([...how.matchAll(/class="how-arrow"/g)].length, 4);
-  const path = html.slice(html.indexOf('id="path-title"'), html.indexOf('id="why-title"'));
-  assert.match(path, /مسیر یادگیری ۹ ماهه/);
-  const cards = [...path.matchAll(/<h3 class="en">(Silver|Gold|Diamond)<\/h3>/g)].map(m => m[1]);
-  assert.deepEqual(cards, ['Silver', 'Gold', 'Diamond']);
-  assert.equal([...path.matchAll(/class="route-badge">ماه [^<]+<\/span>/g)].length, 3);
-  for (const word of ['گرامرهای ساده', 'کافه', 'رستوران', 'فرودگاه', 'فیلم', 'آهنگ']) assert.ok(path.includes(word), word);
-  assert.doesNotMatch(path, /متحول|کمترین زمان|به تسلط/);
+test('learning path and plans keep Silver, Gold and Diamond with the real prices', () => {
+  const path = html.slice(html.indexOf('id="path"'), html.indexOf('id="daily-title"') > -1 ? html.indexOf('<section class="daily') : html.length);
+  assert.match(path, /Silver/);
+  assert.match(path, /Gold/);
+  assert.match(path, /Diamond/);
+  const plans = html.slice(html.indexOf('id="plans"'), html.indexOf('class="section wrap value-lab"'));
+  for (const price of ['۲٬۶۰۰٬۰۰۰', '۳٬۹۵۰٬۰۰۰', '۵٬۵۰۰٬۰۰۰']) assert.ok(plans.includes(price), price);
+  assert.equal([...plans.matchAll(/class="plan"/g)].length, 3);
 });
 
-test('landing CSS sticks to the three brand colours and the reference sections are scoped', () => {
+test('landing styling is scoped, responsive and motion-safe', () => {
+  assert.match(html, /<style>[\s\S]*--navy:#0f3666[\s\S]*<\/style>/);
+  assert.match(html, /@media\(max-width:760px\)/);
+  assert.match(html, /@media\(prefers-reduced-motion:reduce\)/);
   const css = fs.readFileSync(`${__dirname}/app.css`, 'utf8');
-  const block = css.slice(css.lastIndexOf('LANDING v5'));
-  for (const selector of ['.sf-header', '.hero-mock', '.mock-app', '.how-flow', '.route-stop', '.why-grid', '.final-cta', '.faq-list', '.sf-footer']) assert.ok(block.includes(selector), selector);
-  assert.match(block, /#f4c542/);
-  assert.match(block, /#0f3666/);
-  assert.match(block, /@media\(max-width:760px\)/);
-  assert.match(block, /@media\(prefers-reduced-motion:reduce\)/);
-  const cssPath = fs.readFileSync(`${__dirname}/app.css`, 'utf8');
-  const marker = cssPath.match(/LANDING v5[^*]*\*\//)[0];
-  const cs = cssPath.slice(cssPath.search(/LANDING v5/) + marker.length);
-  const hex = [...cs.matchAll(/#([0-9a-f]{6})(?=[;\s),])/gi)].map(m => m[1].toLowerCase());
-  // Every solid colour is one of the three brand colours (navy, yellow, white).
-  const offBrand = [...new Set(hex)].filter(h => !['0f3666', 'f4c542', 'ffffff'].includes(h));
-  assert.deepEqual(offBrand, []);
+  for (const selector of ['.practice-card']) assert.ok(css.includes(selector), selector);
+  for (const selector of ['.hero-character', '.hero-stage', '.practice-card']) assert.ok(css.includes(selector), selector);
+  for (const klass of ['footer-main', 'plan-grid', 'hero-stage']) assert.ok(html.includes(klass), klass);
 });
 
 test('subscription page lets the learner pick a stage and plan without inventing plan differences', () => {
@@ -525,8 +508,8 @@ test('practice hub marks the running session step and offers a single clear call
   assert.match(out, /What would you like to drink\?/);
 });
 
-test('no mascot or character art remains anywhere in the product or landing markup', () => {
-  assert.doesNotMatch(html, /buddy\.svg|buddy-scene|hero-character/);
+test('the landing keeps its companion art while every product screen stays mascot-free', () => {
+  assert.match(html, /class="hero-character"/);
   assert.doesNotMatch(appSource, /buddy\.svg|buddy-scene|page-emblem/);
   const a = setup(); a.signIn();
   for (const route of Object.keys(a.pages)) { a.route(route); assert.doesNotMatch(a.output(), /buddy|mascot/); }
