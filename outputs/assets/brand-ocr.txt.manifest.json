@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "tool_version": "1.1.0",
+  "created_at": "2026-11-10T16:17:09.408347+00:00",
+  "input": "/project/uploads/Ketabche_Sakhtan_Brand_Shakhsi.pdf",
+  "output": "/project/outputs/assets/brand-ocr.txt",
+  "mode": "auto",
+  "language": "fas+eng",
+  "ocr_strategy": {
+    "base_psm_modes": [
+      3,
+      6
+    ],
+    "hires_psm_modes": [
+      3,
+      11
+    ],
+    "hires_fallback_dpi": 400
+  },
+  "dpi": 300,
+  "workers": 1,
+  "render_review_requested": false,
+  "duration_seconds": 0.08,
+  "page_count": 12,
+  "source_counts": {
+    "native": 12
+  },
+  "needs_vision_pages": [
+    10
+  ],
+  "warnings": [],
+  "pages": [
+    {
+      "page": 1,
+      "source": "native",
+      "metrics": {
+        "characters": 101,
+        "meaningful": 98,
+        "words": 20,
+        "lines": 5,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9703,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.0,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 2,
+      "source": "native",
+      "metrics": {
+        "characters": 790,
+        "meaningful": 763,
+        "words": 201,
+        "lines": 14,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9658,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.0714,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 3,
+      "source": "native",
+      "metrics": {
+        "characters": 485,
+        "meaningful": 466,
+        "words": 123,
+        "lines": 10,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9608,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.1,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 4,
+      "source": "native",
+      "metrics": {
+        "characters": 429,
+        "meaningful": 408,
+        "words": 108,
+        "lines": 9,
+        "suspicious": 0,
+        "meaningful_ratio": 0.951,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.1111,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 5,
+      "source": "native",
+      "metrics": {
+        "characters": 306,
+        "meaningful": 293,
+        "words": 75,
+        "lines": 7,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9575,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.1429,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 6,
+      "source": "native",
+      "metrics": {
+        "characters": 419,
+        "meaningful": 402,
+        "words": 97,
+        "lines": 8,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9594,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.25,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 7,
+      "source": "native",
+      "metrics": {
+        "characters": 283,
+        "meaningful": 274,
+        "words": 74,
+        "lines": 9,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9682,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.1111,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 8,
+      "source": "native",
+      "metrics": {
+        "characters": 328,
+        "meaningful": 318,
+        "words": 80,
+        "lines": 8,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9695,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.125,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 9,
+      "source": "native",
+      "metrics": {
+        "characters": 235,
+        "meaningful": 229,
+        "words": 54,
+        "lines": 6,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9745,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.1667,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 10,
+      "source": "native",
+      "metrics": {
+        "characters": 257,
+        "meaningful": 246,
+        "words": 63,
+        "lines": 11,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9572,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.5455,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [
+        "complex_layout"
+      ],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 11,
+      "source": "native",
+      "metrics": {
+        "characters": 201,
+        "meaningful": 195,
+        "words": 56,
+        "lines": 10,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9701,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.1,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    },
+    {
+      "page": 12,
+      "source": "native",
+      "metrics": {
+        "characters": 300,
+        "meaningful": 289,
+        "words": 73,
+        "lines": 8,
+        "suspicious": 0,
+        "meaningful_ratio": 0.9633,
+        "suspicious_ratio": 0.0,
+        "layout_columns_ratio": 0.0,
+        "score": 1.0
+      },
+      "ocr_confidence": null,
+      "ocr_dpi": null,
+      "review_reasons": [],
+      "review_image": null,
+      "warning": null
+    }
+  ]
+}

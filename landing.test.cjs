@@ -168,13 +168,26 @@ test('saved sessions restore; no completion or quota loss on abandoned lessons',
   assert.equal(C.start(s, 1, 'film'), false);
 });
 
-test('review tomorrow, earlier retry on errors, later review on success and no double count', () => {
+test('spaced review walks the fixed day 1, day 2, three-day, week, month, quarter ladder', () => {
   const s = C.initial(); complete(s, 0, 'cafe', 1000);
+  assert.equal(s.reviewAt['0:cafe'], 1000 + 86400000);
+  assert.equal(C.stepOf(s, '0:cafe'), 0);
   assert.deepEqual(C.due(s, 1001), []);
   assert.deepEqual(C.due(s, 86401001), ['0:cafe']);
   C.review(s, '0:cafe', false, 2000); assert.equal(s.reviewAt['0:cafe'], 602000);
-  C.review(s, '0:cafe', true, 3000); assert.equal(s.reviewAt['0:cafe'], 259203000);
-  C.review(s, '0:cafe', true, 4000); assert.equal(s.reviewed.length, 1);
+  assert.equal(C.stepOf(s, '0:cafe'), 0);
+  const ladder = [[1, 86400000], [2, 3 * 86400000], [3, 7 * 86400000], [4, 30 * 86400000], [5, 90 * 86400000]];
+  let now = 3000;
+  for (const [step, gap] of ladder) {
+    C.review(s, '0:cafe', true, now);
+    assert.equal(C.stepOf(s, '0:cafe'), step);
+    assert.equal(s.reviewAt['0:cafe'], now + gap);
+    now += gap;
+  }
+  C.review(s, '0:cafe', true, now);
+  assert.equal(C.stepOf(s, '0:cafe'), 5);
+  assert.equal(s.reviewAt['0:cafe'], now + 90 * 86400000);
+  assert.equal(s.reviewed.length, 1);
   assert.equal(C.review(s, '1:film', true), false);
 });
 
@@ -270,18 +283,37 @@ test('every product page has its own visual identity and accessible heading', ()
     }
     assert.match(a.output(), /class="page-caption"/);
     assert.match(a.output(), /class="app-page-title" tabindex="-1"/);
-    assert.match(a.output(), /class="page-emblem" aria-hidden="true"/);
+    assert.doesNotMatch(a.output(), /buddy\.svg|buddy-scene|page-emblem/);
     assert.match(a.output(), /class="ui-icon"/);
     assert.doesNotMatch(a.output(), /undefined|null/);
   }
 });
 
-test('journey illustration uses completed sessions instead of fabricated metrics', () => {
+test('dashboard shows progress, the Silver to Diamond path and review state from real sessions', () => {
   const s = C.initial(); complete(s, 0, 'cafe'); complete(s, 0, 'film');
   const a = setup(s); a.signIn(); a.route('dashboard');
-  assert.equal([...a.output().matchAll(/class="journey-node /g)].length, 9);
-  assert.equal([...a.output().matchAll(/class="journey-node is-done"/g)].length, 2);
-  assert.match(a.output(), /Silver، 2 از سه سناریوی نمونه تکمیل شده/);
+  const out = a.output();
+  assert.equal([...out.matchAll(/class="path-stop /g)].length, 3);
+  assert.equal([...out.matchAll(/class="path-stop is-current/g)].length, 1);
+  assert.match(out, /class="progress-ring"/);
+  assert.match(out, /اینجا هستی/);
+  assert.equal([...out.matchAll(/class="dash-stat"/g)].length, 4);
+  assert.match(out, /۲ از ۹ موقعیت/);
+  assert.match(out, /class="review-ladder"/);
+  assert.equal([...out.matchAll(/class="ladder-dot"/g)].length, 7);
+  assert.match(out, /class="strength-split"/);
+  assert.match(out, /class="dash-back"/);
+  assert.doesNotMatch(out, /buddy|mascot/);
+});
+
+test('dashboard offers a way back to earlier stages once the learner reaches Gold', () => {
+  const s = C.initial(); s.stage = 1; s.access = [0, 1];
+  const a = setup(s); a.signIn(); a.route('dashboard');
+  const out = a.output();
+  assert.match(out, /class="back-chip" data-action="view-stage" data-stage="0">Silver/);
+  assert.doesNotMatch(out, /class="back-chip"[^>]*>Gold/);
+  a.click('view-stage', { stage: '0' });
+  assert.equal(a.location.hash, '#/dashboard');
 });
 
 test('visual system covers desktop, small screens, reduced motion and print', () => {
@@ -360,7 +392,7 @@ test('hero keeps one section boundary and a clear message-description-cta hierar
   assert.match(hero, /id="hero-title"/);
   assert.match(hero, /class="hero-lead">اصطلاحات روزمره و مکالمهٔ کاربردی/);
   assert.match(hero, /class="hero-actions"[\s\S]*data-start/);
-  assert.match(hero, /class="mini-logo-art" src="buddy\.svg"/);
+  assert.doesNotMatch(hero, /buddy\.svg|mini-logo-art/);
   assert.doesNotMatch(hero, /hero-buddy|floating-note|class="visual"/);
   assert.doesNotMatch(hero, /class="eyebrow"|hero-foot|small-note|hero-character|hero-level-chip|practice-caption|sample-label/);
   assert.equal((html.match(/<section class="hero"/g) || []).length, 1);
@@ -406,6 +438,27 @@ test('learning path starts everyone at Silver and gives each stage its own focus
   assert.equal((path.match(/class="route-marker"/g) || []).length, 3);
   for (const word of ['گرامر ساده', 'کافه', 'رستوران', 'فرودگاه', 'فیلم و سریال', 'آهنگ']) assert.ok(path.includes(word), word);
   assert.doesNotMatch(path, /متحول|کمترین زمان|به تسلط/);
+});
+
+test('review screen shows the ladder with the current step highlighted and advances after a correct answer', () => {
+  const s = C.initial(); complete(s, 0, 'cafe', Date.now() - 2 * 86400000);
+  const a = setup(s); a.signIn(); a.route('review');
+  assert.equal([...a.output().matchAll(/class="ladder-dot"/g)].length, 7);
+  assert.match(a.output(), /مرور بعدی:/);
+  a.click('review-answer', { choice: 'correct' });
+  assert.equal(C.stepOf(a.state(), '0:cafe'), 1);
+  const out = a.output();
+  assert.match(out, /درسته! مرور بعدی: روز ۲/);
+  const states = [...out.matchAll(/<li class="([^"]*)"><span class="ladder-dot"/g)].map(m => m[1]);
+  assert.equal(states.filter(x => x.includes('is-next')).length, 1);
+  assert.equal(states.filter(x => x.includes('is-done')).length, 2);
+});
+
+test('no mascot or character art remains anywhere in the product or landing markup', () => {
+  assert.doesNotMatch(html, /buddy\.svg|buddy-scene|hero-character/);
+  assert.doesNotMatch(appSource, /buddy\.svg|buddy-scene|page-emblem/);
+  const a = setup(); a.signIn();
+  for (const route of Object.keys(a.pages)) { a.route(route); assert.doesNotMatch(a.output(), /buddy|mascot/); }
 });
 
 test('no personal data collection, network submission, fake microphone or external automation', () => {

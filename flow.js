@@ -1,6 +1,9 @@
 (function (root) {
   const stages = ['Silver', 'Gold', 'Diamond'];
   const prices = { Basic: 2600000, Medium: 3950000, Pro: 5500000 };
+  const DAY = 86400000;
+  const reviewIntervals = [1, 1, 3, 7, 30, 90];
+  const reviewLabels = ['روز ۱', 'روز ۲', '۳ روز بعد', '۱ هفته بعد', '۱ ماه بعد', '۳ ماه بعد'];
   const activityXP = s => s.completed.length * 30 + s.reviewed.length * 10;
   const milestones = s => [s.completed.length > 0, s.reviewed.length > 0, s.completed.filter(id => id.startsWith('0:')).length === 3];
   const topics = {
@@ -8,7 +11,7 @@
     film: { title: 'حرف‌زدن دربارهٔ فیلم', context: 'فیلم تموم شده؛ حالا نظرت رو به دوستت بگو.', phrase: 'I really enjoyed it.', meaning: 'واقعاً ازش لذت بردم.', question: 'What did you think of the movie?', wrong: 'I enjoy it yesterday.', tip: '«Enjoyed» برای تجربه‌ایه که در گذشته داشتی.' },
     travel: { title: 'پیداکردن مسیر', context: 'توی یه شهر جدیدی و دنبال نزدیک‌ترین ایستگاه می‌گردی.', phrase: 'Where is the nearest station?', meaning: 'نزدیک‌ترین ایستگاه کجاست؟', question: 'Hi! Do you need any help?', wrong: 'Where station nearest?', tip: 'با «Where is» مکان و با «nearest» نزدیک‌ترین رو می‌پرسی.' }
   };
-  function initial() { return { preferences: { goal: 'daily', experience: 'some', interest: 'cafe', minutes: '10', reminder: true }, completed: [], reviewed: [], reviewAt: {}, session: null, stage: 0, access: [], plan: 'Basic', selectedPlan: 'Basic', selectedStage: 0, assessment: null, order: null }; }
+  function initial() { return { preferences: { goal: 'daily', experience: 'some', interest: 'cafe', minutes: '10', reminder: true }, completed: [], reviewed: [], reviewAt: {}, reviewStep: {}, session: null, stage: 0, access: [], plan: 'Basic', selectedPlan: 'Basic', selectedStage: 0, assessment: null, order: null }; }
   function restore(raw) {
     const s = initial();
     if (!raw || typeof raw !== 'object') return s;
@@ -21,6 +24,7 @@
     s.completed = [...new Set((Array.isArray(raw.completed) ? raw.completed : []).filter(validId))];
     s.reviewed = [...new Set((Array.isArray(raw.reviewed) ? raw.reviewed : []).filter(id => s.completed.includes(id)))];
     for (const id of s.completed) if (Number.isFinite(raw.reviewAt?.[id])) s.reviewAt[id] = raw.reviewAt[id];
+    for (const id of s.completed) if (Number.isInteger(raw.reviewStep?.[id]) && raw.reviewStep[id] >= 0) s.reviewStep[id] = Math.min(raw.reviewStep[id], reviewIntervals.length - 1);
     if (Number.isInteger(raw.stage) && raw.stage >= 0 && raw.stage < 3) s.stage = raw.stage;
     s.access = [...new Set((Array.isArray(raw.access) ? raw.access : []).filter(n => Number.isInteger(n) && n >= 0 && n < 3))];
     if (['Basic', 'Medium', 'Pro'].includes(raw.plan)) s.plan = raw.plan;
@@ -32,6 +36,7 @@
     return s;
   }
   const lessonId = (stage, topic) => `${stage}:${topic}`;
+  const stepOf = (s, id) => Math.min(Number.isInteger(s.reviewStep?.[id]) ? s.reviewStep[id] : 0, reviewIntervals.length - 1);
   const due = (s, now = Date.now()) => s.completed.filter(id => !s.reviewAt[id] || s.reviewAt[id] <= now);
   const canStart = (s, stage, topic) => stage <= s.stage && (s.access.includes(stage) || s.completed.includes(lessonId(stage, topic)) || (stage === 0 && s.completed.filter(id => id.startsWith('0:')).length < 3));
   function start(s, stage, topic) {
@@ -42,14 +47,21 @@
   function finish(s, now = Date.now()) {
     if (!s.session || s.session.step !== 'analysis') return false;
     const id = s.session.id;
-    if (!s.completed.includes(id)) { s.completed.push(id); s.reviewAt[id] = now + 86400000; }
+    if (!s.completed.includes(id)) {
+      s.completed.push(id);
+      s.reviewAt[id] = now + DAY;
+      s.reviewStep[id] = 0;
+    }
     s.session = null;
     return true;
   }
   function review(s, id, correct, now = Date.now()) {
     if (!s.completed.includes(id)) return false;
-    s.reviewAt[id] = now + (correct ? 3 * 86400000 : 600000);
-    if (correct && !s.reviewed.includes(id)) s.reviewed.push(id);
+    const step = stepOf(s, id);
+    if (!correct) { s.reviewAt[id] = now + 600000; return true; }
+    s.reviewStep[id] = Math.min(step + 1, reviewIntervals.length - 1);
+    s.reviewAt[id] = now + reviewIntervals[Math.min(step + 1, reviewIntervals.length - 1)] * DAY;
+    if (!s.reviewed.includes(id)) s.reviewed.push(id);
     return true;
   }
   function assess(s, correct) {
@@ -69,7 +81,7 @@
     if (status === 'success') { if (!s.access.includes(s.order.stage)) s.access.push(s.order.stage); s.plan = s.order.plan; }
     return true;
   }
-  const api = { stages, prices, activityXP, milestones, topics, initial, restore, lessonId, due, canStart, start, finish, review, assess, advance, payment };
+  const api = { stages, prices, reviewIntervals, reviewLabels, stepOf, activityXP, milestones, topics, initial, restore, lessonId, due, canStart, start, finish, review, assess, advance, payment };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SFCore = api;
 })(typeof globalThis === 'undefined' ? this : globalThis);
