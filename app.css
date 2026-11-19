@@ -345,3 +345,66 @@ body{font-size:17px;background:white}.hero{background:radial-gradient(ellipse at
   .auth-switch{font-size:13px}
   .auth-legal .app-check{font-size:12.5px}
 }
+
+/* ---------- HERO v6: پیام روشن، سه‌لایه و بدون شلوغی ---------- */
+.hero{position:relative;isolation:isolate;overflow:hidden;padding:76px 0 84px;color:#0f3666;background:linear-gradient(180deg,#fffdf6 0%,#fff 62%);border-bottom:1px solid #0f366614;scroll-margin-top:96px}
+.hero:before,.hero:after{content:none}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:72px;align-items:center}
+.hero-copy{min-width:0;max-width:560px}
+.hero h1{font-size:clamp(38px,4.4vw,60px);line-height:1.55;font-weight:900;letter-spacing:-1.7px;margin:0}
+.hero h1 span{position:relative;display:inline-block;z-index:0;color:#0f3666}
+.hero h1 span:after{content:'';position:absolute;right:-6px;left:-6px;bottom:6px;height:13px;z-index:-1;background:#f4c542;border-radius:3px;transform:rotate(-1.5deg);opacity:.85}
+.hero .hero-lead{margin:24px 0 0;max-width:480px;font-size:19px;line-height:2.05;color:#0f3666a8;font-weight:500}
+.hero-actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-top:34px}
+.hero-actions .button{font-size:16px;padding:14px 26px}
+.hero .text-link{font-size:15px;color:#0f3666;border-color:#0f366640;padding-block:4px}
+.hero .text-link:hover{border-color:#0f3666}
+.hero-stage{width:100%;min-width:0;max-width:440px;margin-inline:auto}
+.hero-stage .practice-card{width:100%;margin:0;transform:none;border:1px solid #0f366620;border-radius:20px;background:#fff;box-shadow:0 26px 50px -34px #0f366659;overflow:hidden}
+.hero-stage .practice-card:hover{transform:none}
+.hero-stage .practice-top{padding:15px 18px;background:#0f3666;align-items:center}
+.hero-stage .mini-logo{gap:11px;font-weight:600}
+.hero-stage .mini-logo-art{width:38px;height:auto;flex:0 0 auto;background:#fff;border-radius:11px;padding:2px}
+.hero-stage .mini-logo-copy{display:grid;gap:1px;line-height:1.5}
+.hero-stage .mini-logo-copy strong{font-size:14px;font-weight:700}
+.hero-stage .mini-logo-copy small{font-size:11px;color:#c3d5e8;font-weight:400}
+.hero-stage .practice-top .en{font-size:13px;color:#9db8d4;letter-spacing:1px}
+.hero-stage .practice-body{padding:20px 20px 22px}
+.hero-stage .scene-tabs{margin:0 0 18px;gap:6px}
+.hero-stage .scene-tab{border-radius:8px;padding:6px 13px;font-size:12px;border-color:#0f36661f;transition:background .18s,color .18s,border-color .18s}
+.hero-stage .scene-tab:hover{border-color:#0f3666}
+.hero-stage .scene-tab[aria-selected="true"]{background:#0f3666;border-color:#0f3666;color:#fff}
+.hero-stage .chat{min-height:0;gap:11px}
+.hero-stage .bubble{padding:12px 15px;font-size:14px;border-radius:12px 12px 3px 12px;background:#eef3f8;color:#173552}
+.hero-stage .bubble.you{background:#fdf3cd;border-radius:12px 12px 12px 3px}
+.hero-stage .correction{margin-top:14px;padding:10px 13px;background:#f4f8f5;border-right-width:3px;font-size:12px;border-radius:7px}
+.hero-stage .correction .en{font-size:14px;margin-top:3px}
+.hero-stage .correction p:last-child{color:#5f7284}
+@media(max-width:1000px){
+  .hero{padding:56px 0 62px}
+  .hero-grid{gap:36px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .hero h1{font-size:clamp(33px,4.6vw,44px)}
+  .hero .hero-lead{font-size:16.5px;margin-top:18px}
+  .hero-actions{margin-top:26px}
+  .hero-stage{max-width:400px}
+}
+@media(max-width:760px){
+  .hero{padding:34px 0 44px;border-radius:0 0 26px 26px}
+  .hero-grid{grid-template-columns:1fr;gap:30px}
+  .hero h1{font-size:clamp(32px,8.6vw,42px);line-height:1.6}
+  .hero h1 br{display:none}
+  .hero .hero-lead{font-size:15.5px;margin-top:16px;max-width:100%}
+  .hero-actions{gap:18px;margin-top:22px}
+  .hero-actions .button{font-size:15px;padding:12px 20px}
+  .hero .text-link{font-size:13.5px}
+  .hero-stage{max-width:440px}
+  .hero-stage .practice-body{padding:16px 16px 18px}
+}
+@media(max-width:380px){
+  .hero h1{font-size:30px}
+  .hero-stage .practice-top{padding:12px 14px}
+  .hero-stage .mini-logo-copy strong{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  .hero *{animation:none!important}
+}

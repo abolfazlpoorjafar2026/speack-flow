@@ -44,7 +44,7 @@ function complete(s, stage, topic, now = 1000) { assert.equal(C.start(s, stage, 
 
 test('landing retains brand, slogan and real internal anchors; obsolete dialog removed', () => {
   assert.match(html, /<html lang="fa" dir="rtl">/);
-  assert.match(html, /زبان رو جوری که واقعا هست یادبگیر\./);
+  assert.match(html, /زبان رو طوری که<br><span>واقعا هست<\/span> یاد بگیر\./);
   assert.doesNotMatch(html, /<dialog|دوره‌ها|اساتید/);
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
   assert.equal(ids.length, new Set(ids).size);
@@ -351,15 +351,18 @@ test('next-stage assessment requires a fresh answer after either advancement pat
   }
 });
 
-test('hero has one section boundary, a human mascot and no leftover egg mascot markup', () => {
+test('hero keeps one section boundary and a clear message-description-cta hierarchy', () => {
   const heroStart = html.indexOf('<section class="hero"');
   const heroEnd = html.indexOf('<section class="strip"');
   assert.ok(heroStart > -1 && heroEnd > heroStart);
   const hero = html.slice(heroStart, heroEnd);
   assert.match(hero, /id="hero"/);
-  assert.match(hero, /class="hero-character-art" src="buddy\.svg"/);
-  assert.match(hero, /class="hero-character-say"/);
+  assert.match(hero, /id="hero-title"/);
+  assert.match(hero, /class="hero-lead">اصطلاحات روزمره و مکالمهٔ کاربردی/);
+  assert.match(hero, /class="hero-actions"[\s\S]*data-start/);
+  assert.match(hero, /class="mini-logo-art" src="buddy\.svg"/);
   assert.doesNotMatch(hero, /hero-buddy|floating-note|class="visual"/);
+  assert.doesNotMatch(hero, /class="eyebrow"|hero-foot|small-note|hero-character|hero-level-chip|practice-caption|sample-label/);
   assert.equal((html.match(/<section class="hero"/g) || []).length, 1);
   assert.match(html, /<section class="strip"/);
   assert.doesNotMatch(html, /<div class="strip">/);
@@ -372,8 +375,8 @@ test('hero has one section boundary, a human mascot and no leftover egg mascot m
 
 test('hero styling is scoped, responsive and motion-safe', () => {
   const css = fs.readFileSync(`${__dirname}/app.css`, 'utf8');
-  const block = css.slice(css.indexOf('HERO v5'));
-  for (const selector of ['.hero-stage', '.hero-character-art', '.hero-character-say', '.hero-level-chip', '.hero-stage .practice-card']) assert.ok(block.includes(selector), selector);
+  const block = css.slice(css.indexOf('HERO v6'));
+  for (const selector of ['.hero-grid', '.hero .hero-lead', '.hero-actions', '.hero-stage', '.mini-logo-art', '.hero-stage .practice-card']) assert.ok(block.includes(selector), selector);
   assert.match(block, /@media\(max-width:760px\)/);
   assert.match(block, /@media\(prefers-reduced-motion:reduce\)/);
   assert.doesNotMatch(block, /position:absolute;bottom:-?\d+px/);
