@@ -382,6 +382,32 @@ test('hero styling is scoped, responsive and motion-safe', () => {
   assert.doesNotMatch(block, /position:absolute;bottom:-?\d+px/);
 });
 
+test('conversation partner shows the full learn-to-review loop with three drill steps', () => {
+  const start = html.indexOf('id="method"');
+  const end = html.indexOf('</section>', start);
+  const method = html.slice(start, end);
+  assert.match(method, /class="loop-track"/);
+  const steps = [...method.matchAll(/<strong>([^<]+)<\/strong>/g)].map(m => m[1]);
+  assert.deepEqual(steps, ['آموزش', 'تمرین تایپی', 'تمرین صوتی', 'سه مرحله تمرین', 'مرور']);
+  assert.equal((method.match(/class="loop-step/g) || []).length, 5);
+  assert.match(method, /class="loop-step loop-step-key"/);
+  assert.equal((method.match(/class="drill-chip"/g) || []).length, 3);
+  assert.match(method, /توی درس دیدی/);
+});
+
+test('learning path starts everyone at Silver and gives each stage its own focus', () => {
+  const start = html.indexOf('id="path"');
+  const end = html.indexOf('</section>', start);
+  const path = html.slice(start, end);
+  assert.match(path, /همه از Silver شروع می‌کنن/);
+  assert.match(path, /سطح فعلیت نقطهٔ شروع رو عوض نمی‌کنه/);
+  const stops = [...path.matchAll(/class="route-stop (\w+)"/g)].map(m => m[1]);
+  assert.deepEqual(stops, ['silver', 'gold', 'diamond']);
+  assert.equal((path.match(/class="route-marker"/g) || []).length, 3);
+  for (const word of ['گرامر ساده', 'کافه', 'رستوران', 'فرودگاه', 'فیلم و سریال', 'آهنگ']) assert.ok(path.includes(word), word);
+  assert.doesNotMatch(path, /متحول|کمترین زمان|به تسلط/);
+});
+
 test('no personal data collection, network submission, fake microphone or external automation', () => {
   assert.doesNotMatch(appSource, /fetch\(|XMLHttpRequest|getUserMedia|MediaRecorder|type="password"/);
   assert.doesNotMatch(appSource, /document\.cookie|sendBeacon|new WebSocket/);

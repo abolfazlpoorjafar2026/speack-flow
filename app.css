@@ -408,3 +408,81 @@ body{font-size:17px;background:white}.hero{background:radial-gradient(ellipse at
 @media(prefers-reduced-motion:reduce){
   .hero *{animation:none!important}
 }
+
+/* ---------- LOOP v1: از آموزش تا مرور، به‌صورت یک مسیر تصویری ---------- */
+.method:before{content:none}
+.method-head{max-width:640px}
+.method-head .heading{margin-top:12px}
+.method-head .intro{max-width:560px}
+.loop-track{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:38px 0 0;padding:0;list-style:none;isolation:isolate}
+.loop-track:before{content:'';position:absolute;top:23px;right:9%;left:9%;border-top:2px dashed #ffffff2e;z-index:-1}
+.loop-step{display:grid;justify-items:center;text-align:center;gap:8px;min-width:0}
+.loop-num{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid #f4c542;color:#0f3666;font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;line-height:1}
+.loop-step strong{font-size:16px;font-weight:700;color:#fff}
+.loop-step small{font-size:12.5px;line-height:1.85;color:#b9cbdd}
+.loop-step-key .loop-num{background:#f4c542;border-color:#f4c542;color:#0f3666}
+.loop-step-key small{color:#ffe6a3}
+.drill-row{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:28px;padding-top:20px;border-top:1px solid #ffffff1f}
+.drill-label{font-size:12px;color:#9fb6cd;margin-inline-end:4px}
+.drill-chip{font-size:13px;padding:7px 14px;border-radius:30px;background:#ffffff0d;border:1px solid #ffffff24;color:#dbe6f1;line-height:1.7}
+.drill-chip b{color:#f4c542;font-weight:600;margin-inline-end:7px}
+.loop-note{margin-top:20px;font-size:13px;color:#9fb6cd}
+
+/* ---------- ROUTE v2: یک مسیر پیوسته با سه ایستگاه، هرکدام با حس خودش ---------- */
+.route{position:relative;display:grid;gap:14px;margin:6px 0 0;padding:0;list-style:none;isolation:isolate}
+.route:before{content:'';position:absolute;top:44px;bottom:44px;right:26px;width:0;border-right:2px dashed #0f36662e;z-index:-1}
+.route-stop{position:relative;display:grid;grid-template-columns:56px minmax(0,1fr);gap:20px;align-items:start}
+.route-marker{position:relative;z-index:1;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid #0f3666;color:#0f3666;font-family:'DM Sans',sans-serif;font-weight:700;font-size:17px;margin-top:14px;box-shadow:0 0 0 6px #fff}
+.route-stop.gold .route-marker{border-color:#f4c542;background:#f4c542;color:#0f3666}
+.route-stop.diamond .route-marker{border-color:#0f3666;background:#0f3666;color:#f4c542}
+.route-content{padding:24px 26px;border-radius:20px;background:#fff;border:1px solid #0f36661c}
+.route-stop.silver .route-content{border-right:5px solid #0f3666}
+.route-stop.gold .route-content{background:#fffdf4;border-right:5px solid #f4c542}
+.route-stop.diamond .route-content{background:#0f3666;border-color:#0f3666;border-right:5px solid #f4c542;color:#fff}
+.route-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.route-badge{font-size:11px;padding:4px 11px;border-radius:20px;background:#0f36660f;color:#0f3666a8}
+.route-stop.gold .route-badge{background:#f4c54226;color:#0f3666}
+.route-stop.diamond .route-badge{background:#ffffff1a;color:#dbe8f5}
+.route-feel{font-size:15px;font-weight:600;color:#0f3666;line-height:1.8}
+.route-stop.diamond .route-feel{color:#f4c542}
+.route-content h3{font-size:29px;letter-spacing:-1.1px;margin:7px 0 0;line-height:1.4}
+.route-tags{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:14px 0 0}
+.route-tags li{font-size:13px;padding:5px 12px;border-radius:9px;background:#0f366608;border:1px solid #0f366614;color:#173552;line-height:1.7}
+.route-stop.gold .route-tags li{background:#fff7dd;border-color:#f4c54259}
+.route-stop.diamond .route-tags li{background:#ffffff12;border-color:#ffffff26;color:#e8f0f8}
+.route-more{margin:12px 0 0;font-size:14px;line-height:2;color:#5c6f81;max-width:640px}
+.route-stop.diamond .route-more{color:#c4d5e6}
+
+@media(max-width:1000px){
+  .loop-track{gap:10px}
+  .loop-step strong{font-size:14.5px}
+  .loop-step small{font-size:11.5px}
+  .route-stop{grid-template-columns:48px minmax(0,1fr);gap:16px}
+  .route-marker{width:46px;height:46px;font-size:15px;margin-top:16px}
+  .route:before{right:23px}
+  .route-content{padding:21px 20px}
+  .route-content h3{font-size:26px}
+}
+@media(max-width:760px){
+  .loop-track{grid-template-columns:1fr;gap:16px;margin-top:28px}
+  .loop-track:before{top:12px;bottom:12px;right:22px;left:auto;width:0;border-top:0;border-right:2px dashed #ffffff2e}
+  .loop-step{grid-template-columns:46px minmax(0,1fr);justify-items:start;text-align:right;align-items:center;gap:2px 14px}
+  .loop-num{grid-row:span 2;width:44px;height:44px;font-size:15px}
+  .loop-step strong{font-size:15px}
+  .loop-step small{font-size:12px;line-height:1.7}
+  .drill-row{gap:8px;margin-top:22px;padding-top:16px}
+  .drill-label{width:100%;margin:0 0 2px}
+  .drill-chip{font-size:12px;padding:6px 12px}
+  .loop-note{font-size:12px}
+  .route{gap:10px}
+  .route:before{right:19px;top:36px;bottom:36px}
+  .route-stop{grid-template-columns:40px minmax(0,1fr);gap:12px}
+  .route-marker{width:38px;height:38px;font-size:13px;margin-top:18px;box-shadow:0 0 0 5px #fff}
+  .route-content{padding:18px 16px;border-radius:16px;border-right-width:4px}
+  .route-content h3{font-size:23px;margin-top:5px}
+  .route-feel{font-size:14px}
+  .route-badge{font-size:10px;padding:3px 9px}
+  .route-tags{gap:6px;margin-top:12px}
+  .route-tags li{font-size:12px;padding:4px 10px}
+  .route-more{font-size:13px;line-height:1.95;margin-top:10px}
+}
