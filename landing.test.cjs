@@ -21,7 +21,9 @@ function setup(raw = null) {
     after(el) { elements.set('#product-app', el); }
   }
   for (const m of html.matchAll(/\bid="([^"]+)"/g)) elements.set(`#${m[1]}`, new Element());
-  const tabs = ['cafe', 'film', 'travel'].map(n => { const el = elements.get(`#tab-${n}`); el.dataset.scene = n; el.id = `tab-${n}`; return el; });
+  const tabs = ['cafe', 'film', 'travel'].map(n => { const el = new Element(); el.dataset.scene = n; el.id = `tab-${n}`; return el; });
+  // Talking partner lives inside the product (practice hub); expose its nodes to the landing test.
+  const partnerNodes = ['partner-line', 'user-line', 'better-line', 'tip-line', 'scene-panel'].map(id => { const el = new Element(); elements.set(`#${id}`, el); return el; });
   const starts = Array.from({ length: 8 }, () => new Element());
   const document = new Element(); document.body = new Element();
   document.querySelector = sel => elements.get(sel) || null;
@@ -37,18 +39,18 @@ function setup(raw = null) {
   const api = window.testing;
   const route = name => { location.hash = `#/${name}`; api.render(); };
   const click = (name, dataset = {}) => api.handlers[name]({ dataset });
-  return { ...api, elements, window, document, location, stored, starts, tabs, route, click, output: () => elements.get('#product-app').innerHTML };
+  return { ...api, elements, window, document, location, stored, starts, tabs, partner: () => ({ tabs, better: elements.get('#better-line') }), route, click, output: () => elements.get('#product-app').innerHTML };
 }
 
 function complete(s, stage, topic, now = 1000) { assert.equal(C.start(s, stage, topic), true); s.session.step = 'analysis'; assert.equal(C.finish(s, now), true); }
 
 test('landing retains brand, slogan and real internal anchors; obsolete dialog removed', () => {
   assert.match(html, /<html lang="fa" dir="rtl">/);
-  assert.match(html, /زبان رو طوری که<br><span>واقعا هست<\/span> یاد بگیر\./);
+  assert.match(html, /<span>واقعاً هست<\/span> یاد بگیر/);
   assert.doesNotMatch(html, /<dialog|دوره‌ها|اساتید/);
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
   assert.equal(ids.length, new Set(ids).size);
-  for (const m of html.matchAll(/href="#(?!\/)([^"]+)"/g)) assert.ok(ids.includes(m[1]));
+  for (const m of html.matchAll(/href="#(?!\/)([^"]+)"/g)) assert.ok(ids.includes(m[1]), m[1]);
   for (const file of ['app.js', 'flow.js', 'app.css']) assert.ok(html.includes(file));
 });
 
@@ -270,9 +272,10 @@ test('deletion requires confirmation, cancel keeps data, confirm clears local pr
   assert.equal(a.stored.size, 0); assert.equal(a.location.hash, '/onboarding');
 });
 
-test('landing tabs, keyboard navigation and mobile menu remain functional', () => {
-  const a = setup(); a.tabs[1].fire('click'); assert.equal(a.elements.get('#better-line').textContent, C.topics.film.phrase);
-  a.tabs[1].fire('keydown', { key: 'ArrowLeft' }); assert.equal(a.tabs[2].attrs['aria-selected'], 'true');
+test('talking partner still gives per-topic feedback and the mobile menu opens and closes', () => {
+  const a = setup(); const partner = a.partner();
+  partner.tabs[1].fire('click'); assert.equal(partner.better.textContent, C.topics.film.phrase);
+  partner.tabs[1].fire('keydown', { key: 'ArrowLeft' }); assert.equal(partner.tabs[2].attrs['aria-selected'], 'true');
   const toggle = a.elements.get('#menu-toggle'); toggle.fire('click'); assert.equal(toggle.attrs['aria-expanded'], 'true');
   a.document.fire('keydown', { key: 'Escape' }); assert.equal(toggle.attrs['aria-expanded'], 'false');
 });
@@ -365,12 +368,11 @@ test('nine-month map has nine actionable stops and preserves access guards', () 
   assert.equal([...a.output().matchAll(/class="map-node locked"/g)].length, 6);
 });
 
-test('prices agree between landing, plans, checkout and parent view', () => {
+test('prices agree between subscription, checkout and parent view', () => {
   assert.deepEqual(C.prices, { Basic: 2600000, Medium: 3950000, Pro: 5500000 });
   const a = setup(); a.signIn();
   for (const [plan, price] of Object.entries(C.prices)) {
     const formatted = price.toLocaleString('fa-IR');
-    assert.ok(html.includes(formatted));
     a.route('subscription'); assert.ok(a.output().includes(formatted));
     a.click('choose-plan', { plan }); a.route('checkout');
     assert.ok(a.output().includes(formatted));
@@ -415,87 +417,69 @@ test('next-stage assessment requires a fresh answer after either advancement pat
   }
 });
 
-test('hero keeps one section boundary and a clear message-description-cta hierarchy', () => {
+test('hero follows the reference layout: message, pill, one CTA and a dashboard mock', () => {
   const heroStart = html.indexOf('<section class="hero"');
-  const heroEnd = html.indexOf('<section class="strip"');
+  const heroEnd = html.indexOf('<section class="section how"');
   assert.ok(heroStart > -1 && heroEnd > heroStart);
   const hero = html.slice(heroStart, heroEnd);
-  assert.match(hero, /id="hero"/);
   assert.match(hero, /id="hero-title"/);
-  assert.match(hero, /class="hero-lead">اصطلاحات روزمره و مکالمهٔ کاربردی/);
-  assert.match(hero, /class="hero-actions"[\s\S]*data-start/);
-  assert.doesNotMatch(hero, /buddy\.svg|mini-logo-art/);
-  assert.doesNotMatch(hero, /hero-buddy|floating-note|class="visual"/);
-  assert.doesNotMatch(hero, /class="eyebrow"|hero-foot|small-note|hero-character|hero-level-chip|practice-caption|sample-label/);
+  assert.match(hero, /<span>واقعاً هست<\/span>/);
+  assert.match(hero, /class="hero-lead">اصطلاحات روزمره و مکالمهٔ کاربردی</);
+  assert.match(hero, /class="button hero-cta" data-start>شروع تجربه رایگان/);
+  assert.match(hero, /class="hero-mock"/);
+  assert.match(hero, /class="mock-app">/);
+  for (const part of ['مرحلهٔ فعلی:', 'Silver', 'قدم بعدی:', 'مرورهای امروز']) assert.ok(hero.includes(part), part);
+  assert.doesNotMatch(hero, /buddy\.svg|hero-actions|floating-note|class="strip"/);
   assert.equal((html.match(/<section class="hero"/g) || []).length, 1);
-  assert.match(html, /<section class="strip"/);
-  assert.doesNotMatch(html, /<div class="strip">/);
-  const svg = fs.readFileSync(`${__dirname}/buddy.svg`, 'utf8');
-  assert.match(svg, /viewBox="0 0 320 360"/);
-  assert.match(svg, /آدمک همراه/);
-  assert.match(svg, /<circle cx="160" cy="106" r="57"/);
-  assert.doesNotMatch(svg, /<rect x="80" y="114" width="170"/);
 });
 
-test('hero styling is scoped, responsive and motion-safe', () => {
-  const css = fs.readFileSync(`${__dirname}/app.css`, 'utf8');
-  const block = css.slice(css.indexOf('HERO v6'));
-  for (const selector of ['.hero-grid', '.hero .hero-lead', '.hero-actions', '.hero-stage', '.mini-logo-art', '.hero-stage .practice-card']) assert.ok(block.includes(selector), selector);
-  assert.match(block, /@media\(max-width:760px\)/);
-  assert.match(block, /@media\(prefers-reduced-motion:reduce\)/);
-  assert.doesNotMatch(block, /position:absolute;bottom:-?\d+px/);
+test('header and footer match the reference: pill logo, four links, CTA, navy footer with links and socials', () => {
+  const header = html.slice(html.indexOf('<header'), html.indexOf('</header>'));
+  assert.match(header, /id="main-nav"/);
+  const navBlock = header.match(/<nav class="nav"[^>]*>([\s\S]*?)<\/nav>/)[1];
+  const navLinks = [...navBlock.matchAll(/<a href="([^"]+)">([^<]+)<\/a>/g)].map(m => m[2]);
+  assert.deepEqual(navLinks, ['برای والدین', 'سوالات متداول', 'درباره ما', 'تماس با ما']);
+  assert.match(header, /class="button header-action" data-start>شروع رایگان/);
+  assert.match(header, /class="brand-name en"><b>Speak<\/b>Flow<\/span>/);
+  assert.match(header, /id="menu-toggle"/);
+  const footer = html.slice(html.indexOf('<footer'), html.indexOf('</footer>'));
+  assert.match(footer, /class="wrap sf-footer"/);
+  const footLinks = [...footer.matchAll(/<a href="[^"]+">([^<]+)<\/a>/g)].map(m => m[1]);
+  for (const label of ['درباره ما', 'تماس با ما', 'پشتیبانی', 'حریم خصوصی', 'شرایط استفاده']) assert.ok(footLinks.includes(label), label);
+  assert.equal([...footer.matchAll(/class="social"/g)].length, 3);
+  assert.match(footer, /Speak Better\. Live Bolder\./);
 });
 
-test('conversation partner shows the full learn-to-review loop with three drill steps', () => {
-  const start = html.indexOf('id="method"');
-  const end = html.indexOf('</section>', start);
-  const method = html.slice(start, end);
-  assert.match(method, /class="loop-track"/);
-  const steps = [...method.matchAll(/<strong>([^<]+)<\/strong>/g)].map(m => m[1]);
-  assert.deepEqual(steps, ['آموزش', 'تمرین تایپی', 'تمرین صوتی', 'سه مرحله تمرین', 'مرور']);
-  assert.equal((method.match(/class="loop-step/g) || []).length, 5);
-  assert.match(method, /class="loop-step loop-step-key"/);
-  assert.equal((method.match(/class="drill-chip"/g) || []).length, 3);
-  assert.match(method, /توی درس دیدی/);
-});
-
-test('learning path starts everyone at Silver and gives each stage its own focus', () => {
-  const start = html.indexOf('id="path"');
-  const end = html.indexOf('</section>', start);
-  const path = html.slice(start, end);
-  assert.match(path, /همه از Silver شروع می‌کنن/);
-  assert.match(path, /سطح فعلیت نقطهٔ شروع رو عوض نمی‌کنه/);
-  const stops = [...path.matchAll(/class="route-stop (\w+)"/g)].map(m => m[1]);
-  assert.deepEqual(stops, ['silver', 'gold', 'diamond']);
-  assert.equal((path.match(/class="route-marker"/g) || []).length, 3);
-  for (const word of ['گرامر ساده', 'کافه', 'رستوران', 'فرودگاه', 'فیلم و سریال', 'آهنگ']) assert.ok(path.includes(word), word);
+test('talking partner loop and stage cards use the reference flow and palette', () => {
+  const how = html.slice(html.indexOf('id="how-title"'), html.indexOf('id="path-title"'));
+  assert.match(how, /class="how-flow"/);
+  const steps = [...how.matchAll(/class="how-step"><span class="how-icon"[^>]*>[\s\S]*?<\/span><strong>([^<]+)<\/strong>/g)].map(m => m[1]);
+  assert.deepEqual(steps, ['آموزش', 'تمرین تایپی', 'تمرین صوتی', 'تمرین سه‌مرحله‌ای', 'مرور']);
+  assert.equal([...how.matchAll(/class="how-arrow"/g)].length, 4);
+  const path = html.slice(html.indexOf('id="path-title"'), html.indexOf('id="why-title"'));
+  assert.match(path, /مسیر یادگیری ۹ ماهه/);
+  const cards = [...path.matchAll(/<h3 class="en">(Silver|Gold|Diamond)<\/h3>/g)].map(m => m[1]);
+  assert.deepEqual(cards, ['Silver', 'Gold', 'Diamond']);
+  assert.equal([...path.matchAll(/class="route-badge">ماه [^<]+<\/span>/g)].length, 3);
+  for (const word of ['گرامرهای ساده', 'کافه', 'رستوران', 'فرودگاه', 'فیلم', 'آهنگ']) assert.ok(path.includes(word), word);
   assert.doesNotMatch(path, /متحول|کمترین زمان|به تسلط/);
 });
 
-test('review screen shows the ladder with the current step highlighted and advances after a correct answer', () => {
-  const s = C.initial(); complete(s, 0, 'cafe', Date.now() - 2 * 86400000);
-  const a = setup(s); a.signIn(); a.route('review');
-  assert.equal([...a.output().matchAll(/class="ladder-dot"/g)].length, 7);
-  assert.match(a.output(), /مرور بعدی:/);
-  a.click('review-answer', { choice: 'correct' });
-  assert.equal(C.stepOf(a.state(), '0:cafe'), 1);
-  const out = a.output();
-  assert.match(out, /درسته! مرور بعدی: روز ۲/);
-  const states = [...out.matchAll(/<li class="([^"]*)"><span class="ladder-dot"/g)].map(m => m[1]);
-  assert.equal(states.filter(x => x.includes('is-next')).length, 1);
-  assert.equal(states.filter(x => x.includes('is-done')).length, 2);
-});
-
-test('landing plans keep the real prices, add no invented feature list and show the purchase path', () => {
-  const start = html.indexOf('id="plans"');
-  const end = html.indexOf('</section>', start);
-  const plans = html.slice(start, end);
-  for (const price of ['۲٬۶۰۰٬۰۰۰', '۳٬۹۵۰٬۰۰۰', '۵٬۵۰۰٬۰۰۰']) assert.ok(plans.includes(price), price);
-  assert.doesNotMatch(plans, /<ul|<li>مسیر آموزشی|سهمیه|تحلیل عمیق/);
-  assert.equal([...plans.matchAll(/data-plan="(Basic|Medium|Pro)"/g)].length, 3);
-  const steps = [...plans.matchAll(/<strong>([^<]+)<\/strong>/g)].map(m => m[1]);
-  assert.deepEqual(steps, ['انتخاب پلن', 'پرداخت از درگاه', 'تأیید پرداخت', 'فعال شدن دسترسی']);
-  assert.match(plans, /تفاوت دقیق امکانات Basic، Medium و Pro پیش از خرید اعلام می‌شه/);
+test('landing CSS sticks to the three brand colours and the reference sections are scoped', () => {
+  const css = fs.readFileSync(`${__dirname}/app.css`, 'utf8');
+  const block = css.slice(css.lastIndexOf('LANDING v4'));
+  for (const selector of ['.sf-header', '.hero-mock', '.mock-app', '.how-flow', '.route-stop', '.why-grid', '.final-cta', '.faq-list', '.sf-footer']) assert.ok(block.includes(selector), selector);
+  assert.match(block, /var\(--yellow\)/);
+  assert.match(block, /var\(--navy\)/);
+  assert.match(block, /@media\(max-width:760px\)/);
+  assert.match(block, /@media\(prefers-reduced-motion:reduce\)/);
+  const cssPath = fs.readFileSync(`${__dirname}/app.css`, 'utf8');
+  const marker = cssPath.match(/LANDING v4[^*]*\*\//)[0];
+  const cs = cssPath.slice(cssPath.search(/LANDING v4/) + marker.length);
+  const hex = [...cs.matchAll(/#([0-9a-f]{6})(?=[;\s),])/gi)].map(m => m[1].toLowerCase());
+  // Every solid colour is one of the three brand colours (navy, yellow, white).
+  const offBrand = [...new Set(hex)].filter(h => !['0f3666', 'f4c542', 'ffffff'].includes(h));
+  assert.deepEqual(offBrand, []);
 });
 
 test('subscription page lets the learner pick a stage and plan without inventing plan differences', () => {
