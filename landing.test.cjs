@@ -467,15 +467,15 @@ test('talking partner loop and stage cards use the reference flow and palette', 
 
 test('landing CSS sticks to the three brand colours and the reference sections are scoped', () => {
   const css = fs.readFileSync(`${__dirname}/app.css`, 'utf8');
-  const block = css.slice(css.lastIndexOf('LANDING v4'));
+  const block = css.slice(css.lastIndexOf('LANDING v5'));
   for (const selector of ['.sf-header', '.hero-mock', '.mock-app', '.how-flow', '.route-stop', '.why-grid', '.final-cta', '.faq-list', '.sf-footer']) assert.ok(block.includes(selector), selector);
-  assert.match(block, /var\(--yellow\)/);
-  assert.match(block, /var\(--navy\)/);
+  assert.match(block, /#f4c542/);
+  assert.match(block, /#0f3666/);
   assert.match(block, /@media\(max-width:760px\)/);
   assert.match(block, /@media\(prefers-reduced-motion:reduce\)/);
   const cssPath = fs.readFileSync(`${__dirname}/app.css`, 'utf8');
-  const marker = cssPath.match(/LANDING v4[^*]*\*\//)[0];
-  const cs = cssPath.slice(cssPath.search(/LANDING v4/) + marker.length);
+  const marker = cssPath.match(/LANDING v5[^*]*\*\//)[0];
+  const cs = cssPath.slice(cssPath.search(/LANDING v5/) + marker.length);
   const hex = [...cs.matchAll(/#([0-9a-f]{6})(?=[;\s),])/gi)].map(m => m[1].toLowerCase());
   // Every solid colour is one of the three brand colours (navy, yellow, white).
   const offBrand = [...new Set(hex)].filter(h => !['0f3666', 'f4c542', 'ffffff'].includes(h));
