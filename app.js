@@ -258,20 +258,101 @@
     return `${head('پیشرفت، با قدم‌هایی که برداشتی.','آمار این صفحه از فعالیت‌های خودت در همین مرورگر ساخته می‌شه.')}${progressChart()}<div class="app-grid three">${C.stages.map((name,i)=>`<div class="app-card"><h2 class="en">${name}</h2><span class="app-metric">${faDigits(Math.min(stageProgress(i),3))} / ۳</span><p>سناریوی نمونهٔ تکمیل‌شده</p></div>`).join('')}</div><section class="app-card review-schedule" style="margin-top:20px"><h2>وضعیت مرورها</h2><p class="review-next-note">${state.completed.length?`مرورهای انجام‌شده: <b>${faDigits(state.reviewed.length)}</b> از ${faDigits(state.completed.length)}`:'هنوز چیزی برای مرور ثبت نشده.'}</p>${reviewLadder(state.completed.length?C.stepOf(state,state.completed[0]):-1)}</section><div class="app-card" style="margin-top:20px"><h2>جلسه‌ها و عبارت‌های من</h2>${state.completed.length?`<ul class="app-list">${state.completed.map(id=>`<li class="app-row"><div><h3>${topicFor(id).title}</h3><p class="en" lang="en">${topicFor(id).phrase}</p></div><span class="app-badge ${state.reviewed.includes(id)?'success':''}">${state.reviewed.includes(id)?'مرور شده':'در برنامهٔ مرور'}</span></li>`).join('')}</ul>`:empty('شروع تازه، بدون آمار ساختگی.','با تکمیل اولین جلسه، عبارت‌ها و پیشرفتت اینجا ثبت می‌شن.',link('شروع مسیر','roadmap'))}</div><div class="app-actions">${link('ارزیابی مرحله','assessment','outline')}${link('مرور عبارت‌ها','review','outline')}</div>`;
   }
   function subscription() {
-    return `${head('امکانات رو متناسب با خودت انتخاب کن.','مرحلهٔ یادگیری با پلن امکانات فرق داره. تغییر پلن، مسیرت رو از اول شروع نمی‌کنه.')}<div class="app-grid"><div class="app-card"><div class="video-slot"><strong>معرفی مسیر با ابوالفضل</strong><p>محل ویدیوی توضیح مراحل و انتخاب اشتراک</p><span class="app-badge" style="margin-top:15px">ویدیو هنوز تحویل داده نشده</span></div><p>Silver، Gold و Diamond هر کدوم سه ماه هستن. برای هر مرحله، سطح امکانات رو جدا انتخاب می‌کنی. دیدن ویدیو شرط خرید نیست.</p></div><div class="app-card"><h2>دسترسی فعلی تو</h2><p>${state.access.length?state.access.map(stageName).join('، ')+' · '+state.plan:'تجربهٔ رایگان Silver'}</p>${field('مرحلهٔ سفارش','stage',C.stages.map((n,i)=>[String(i),n+' · سه ماه']),String(state.selectedStage))}${note('قیمت برای دسترسی هر مرحلهٔ سه‌ماهه نمایش داده شده؛ جزئیات سهمیه و شرایط ارتقا پیش از خرید مشخص می‌شن.','warning')}<a class="app-subtle-link" href="#/parent">والد پرداخت‌کننده است؟ راهنمای والد</a></div></div><div class="app-grid three" style="margin-top:20px">${['Basic','Medium','Pro'].map((name,i)=>`<div class="app-card ${i===1?'dark':''}"><span class="en" style="font-size:26px">${name}</span><h3 style="margin-top:15px">${['شروع منظم','تمرین بیشتر','تحلیل عمیق‌تر'][i]}</h3><ul class="app-list"><li>مسیر آموزشی مرحله</li><li>${['تمرین با پارتنر','سهمیهٔ بیشتر تمرین','سهمیهٔ بالاتر تمرین'][i]}</li><li>${i===2?'تحلیل جزئی‌تر مکالمه':'بازخورد و مرور آموخته‌ها'}</li></ul><div class="plan-price">${money(C.prices[name])}<small>تومان / مرحلهٔ سه‌ماهه</small></div><div class="app-actions">${action('انتخاب '+name,'choose-plan',i===1?'':'outline',`data-plan="${name}"`)}</div></div>`).join('')}</div><details class="app-demo-controls"><summary>نمایش حالت انقضای دسترسی</summary>${action('پایان دسترسی نمونه، با حفظ سابقه','expire-access','outline')}</details>`;
+    const plans = ['Basic','Medium','Pro'];
+    const current = state.access.length ? state.access.map(stageName).join('، ') : 'تجربهٔ رایگان Silver';
+    return `${head('پلنت رو انتخاب کن، بعد پرداخت کن.','قیمت هر پلن برای یک مرحلهٔ سه‌ماهه‌ست. بعد از تأیید پرداخت، دسترسی همون مرحله فعال می‌شه.')}
+      <div class="sub-grid">
+        <section class="app-card sub-pick">
+          <h2>مرحله‌ای که می‌خوای باز کنی</h2>
+          <p class="sub-help">مسیر نُه‌ماهه سه مرحله داره. برای هر مرحله یک بار پرداخت می‌کنی.</p>
+          <div class="stage-pick" role="radiogroup" aria-label="مرحلهٔ سفارش">
+            ${C.stages.map((name,i)=>`<button type="button" class="stage-option ${state.selectedStage===i?'is-on':''}" role="radio" aria-checked="${state.selectedStage===i}" data-action="pick-stage" data-stage="${i}"><strong class="en">${name}</strong><small>ماه ${faDigits(i*3+1)} تا ${faDigits(i*3+3)}</small></button>`).join('')}
+          </div>
+          <dl class="app-summary sub-access"><div><dt>دسترسی فعلی</dt><dd>${current}</dd></div></dl>
+          <a class="app-subtle-link" href="#/parent">والد پرداخت‌کننده است؟ راهنمای والد</a>
+        </section>
+        <section class="app-card sub-now">
+          <span class="app-kicker">سفارش انتخابی</span>
+          <h2>${stageName(state.selectedStage)} · <span class="en">${state.selectedPlan}</span></h2>
+          <div class="sub-total"><span>${money(C.prices[state.selectedPlan])}</span> تومان</div>
+          <p class="sub-help">برای یک مرحلهٔ سه‌ماهه. تمدید خودکار نداریم.</p>
+          <ol class="mini-steps"><li>انتخاب پلن</li><li>پرداخت از درگاه</li><li>تأیید پرداخت</li><li>فعال شدن دسترسی</li></ol>
+        </section>
+      </div>
+      <div class="plan-grid app-plans">
+        ${plans.map(name=>`<article class="plan-card ${state.selectedPlan===name?'is-on':''}">
+          <span class="en plan-name">${name}</span>
+          <div class="plan-price">${money(C.prices[name])}<small>تومان / مرحلهٔ سه‌ماهه</small></div>
+          <p class="plan-line">برای یک مرحلهٔ سه‌ماهه از مسیر.</p>
+          <button type="button" class="button ${state.selectedPlan===name?'':'outline'}" data-action="choose-plan" data-plan="${name}">${state.selectedPlan===name?'ادامهٔ خرید ' + name:'انتخاب ' + name}</button>
+        </article>`).join('')}
+      </div>
+      <p class="sub-note">تفاوت دقیق امکانات Basic، Medium و Pro پیش از خرید اعلام می‌شه؛ فعلاً هیچ ویژگی اضافه‌ای به پلن‌ها نسبت داده نمی‌شه.</p>
+      <details class="app-demo-controls"><summary>نمایش حالت انقضای دسترسی</summary>${action('پایان دسترسی نمونه، با حفظ سابقه','expire-access','outline')}</details>`;
   }
   function checkout() {
-    return `<div class="app-narrow">${head('قبل از ادامه، یه نگاه آخر.','مرحله، امکانات و پرداخت‌کننده رو جدا ببین.')}<div class="app-card"><h2>خلاصهٔ سفارش نمونه</h2><dl class="app-summary"><div><dt>مرحله</dt><dd>${stageName(state.selectedStage)}</dd></div><div><dt>سطح امکانات</dt><dd class="en">${state.selectedPlan}</dd></div><div><dt>مدت مرحله</dt><dd>سه ماه</dd></div><div><dt>مبلغ کل</dt><dd>${money(C.prices[state.selectedPlan])} تومان</dd></div></dl>${note('مبلغ برای یک مرحلهٔ سه‌ماهه است؛ شرایط خرید و استرداد پیش از فروش اعلام می‌شن. اینجا هیچ پرداخت واقعی انجام نمی‌شه.','warning')}<label class="app-check"><input id="checkout-consent" type="checkbox"><span>می‌دونم این فقط پیش‌نمایش مسیر سفارشه و مبلغی پرداخت نمی‌کنم.</span></label><div id="checkout-feedback" role="status"></div><div class="app-actions">${action('پیش‌نمایش وضعیت پرداخت','create-order')}${link('تغییر پلن','subscription','outline')}</div><div class="app-form-footer"><a href="#/parent">راهنمای پرداخت والد</a> · <a href="#/support">سؤال دربارهٔ سفارش یا استرداد</a></div></div></div>`;
+    const o = state.order;
+    const plan = o ? o.plan : state.selectedPlan;
+    const stage = o ? o.stage : state.selectedStage;
+    const paid = o && o.status === 'success';
+    return `<div class="app-narrow">${head('یه نگاه آخر، بعد پرداخت.','مبلغ و مرحله رو ببین؛ بعد به درگاه پرداخت می‌ری.')}
+      <div class="app-card">
+        <ol class="mini-steps is-flow"><li class="is-done">انتخاب پلن</li><li class="is-current">پرداخت از درگاه</li><li>تأیید پرداخت</li><li>فعال شدن دسترسی</li></ol>
+        <dl class="app-summary">
+          <div><dt>مرحله</dt><dd>${stageName(stage)}</dd></div>
+          <div><dt>پلن</dt><dd class="en">${plan}</dd></div>
+          <div><dt>مدت</dt><dd>سه ماه</dd></div>
+          <div><dt>مبلغ قابل پرداخت</dt><dd>${money(C.prices[plan])} تومان</dd></div>
+        </dl>
+        ${paid ? note('این سفارش قبلاً پرداخت شده و دسترسی‌اش فعاله.','success') : ''}
+        <div class="app-actions">
+          ${paid ? action('ادامهٔ مسیر یادگیری','after-purchase') : action('پرداخت از درگاه','pay-gateway')}
+          ${link('تغییر پلن یا مرحله','subscription','outline')}
+        </div>
+        <div id="checkout-feedback" role="status"></div>
+        <p class="checkout-fine">مبلغ برای یک مرحلهٔ سه‌ماهه‌ست. تمدید خودکار نداریم و دسترسی بعد از تأیید پرداخت فعال می‌شه.</p>
+      </div>
+    </div>`;
   }
   function payment() {
     const o=state.order;
-    if(!o) return empty('سفارشی انتخاب نشده.','اول مرحله و پلن رو انتخاب کن.',link('دیدن اشتراک‌ها','subscription'));
-    const statuses={preview:['وضعیت پرداخت رو پیش‌نمایش کن.','برای دیدن شاخه‌های فلو، یکی از حالت‌های پایین رو انتخاب کن.'],success:['پرداخت موفق · نمونه','دسترسی نمایشی برای همین مرحله فعال شد. هیچ تراکنش بانکی انجام نشده.'],pending:['وضعیت در انتظار بررسی','تا مشخص‌شدن نتیجه، دوباره پرداخت نکن. در محصول نهایی، تأیید از سرور درگاه گرفته می‌شه.'],failed:['پرداخت تأیید نشد.','می‌تونی سفارش رو بازبینی کنی یا از پشتیبانی کمک بگیری.'],cancelled:['پرداخت لغو شد.','سابقهٔ یادگیری سر جاشه؛ هر وقت خواستی برگرد.']};
-    const [title,text]=statuses[o.status]||statuses.preview;
-    return `<div class="app-narrow">${head(title,text)}<div class="app-card"><div class="app-status-icon" aria-hidden="true">${o.status==='success'?'✓':o.status==='pending'?'…':'◇'}</div><dl class="app-summary"><div><dt>مرحله</dt><dd>${stageName(o.stage)}</dd></div><div><dt>پلن</dt><dd>${o.plan}</dd></div><div><dt>نوع رسید</dt><dd>نمایشی، بدون تراکنش</dd></div><div><dt>تمدید خودکار</dt><dd>انجام نمی‌شه</dd></div></dl>${o.status==='success'?`<div class="app-actions">${action('ادامهٔ مسیر یادگیری','after-purchase')}${link('مدیریت اشتراک','subscription','outline')}</div>`:`<div class="app-actions">${link('بازبینی سفارش','checkout','outline')}${link('پیگیری وضعیت / کسر وجه','support','outline')}</div>`}<details class="app-demo-controls" ${o.status==='preview'?'open':''}><summary>حالت‌های آزمایشی پرداخت (بدون تراکنش)</summary>${['success','pending','failed','cancelled'].map((s,i)=>action(['موفق','در انتظار','ناموفق','لغو'][i],'payment-state','outline',`data-status="${s}"`)).join('')}</details></div></div>`;
+    if(!o) return empty('هنوز سفارشی نساختی.','اول پلن رو انتخاب کن تا سفارش ساخته بشه.',link('انتخاب پلن','subscription'));
+    const stepOf = o.status==='preview' ? 1 : o.status==='success' ? 3 : 2;
+    const flows = ['انتخاب پلن','پرداخت از درگاه','تأیید پرداخت','فعال شدن دسترسی'];
+    const flowsHtml = `<ol class="mini-steps is-flow">${flows.map((t,i)=>`<li class="${i<stepOf?'is-done':i===stepOf?'is-current':''}">${t}</li>`).join('')}</ol>`;
+    if (o.status === 'preview') {
+      return `<div class="app-narrow">${head('در حال انتقال به درگاه پرداخت.','صفحهٔ درگاه در محصول نهایی باز می‌شه؛ این‌جا فقط مسیر رو می‌بینی.')}
+        <div class="app-card">
+          ${flowsHtml}
+          <dl class="app-summary"><div><dt>مرحله</dt><dd>${stageName(o.stage)}</dd></div><div><dt>پلن</dt><dd class="en">${o.plan}</dd></div><div><dt>مبلغ</dt><dd>${money(C.prices[o.plan])} تومان</dd></div></dl>
+          <p class="gateway-line">پرداخت در صفحهٔ امن درگاه انجام می‌شه. بعد از پرداخت، نتیجه رو همین‌جا می‌بینی.</p>
+          <div class="app-actions">${action('رفتن به درگاه','payment-state','', 'data-status="pending"')}${link('لغو و برگشت به سفارش','checkout','outline')}</div>
+          <details class="app-demo-controls"><summary>نتیجهٔ پرداخت (نمایشی، بدون تراکنش)</summary>${['success','failed','cancelled'].map((st,i)=>action(['پرداخت موفق','پرداخت ناموفق','لغو پرداخت'][i],'payment-state','outline',`data-status="${st}"`)).join('')}</details>
+        </div>
+      </div>`;
+    }
+    const statuses={
+      pending:['در حال تأیید پرداخت','نتیجه از درگاه گرفته می‌شه. چند لحظه صبر کن و دوباره پرداخت نکن.'],
+      success:['پرداخت تأیید شد.','دسترسی مرحلهٔ '+stageName(o.stage)+' فعال شد.'],
+      failed:['پرداخت تأیید نشد.','مبلغی کم نشده. می‌تونی دوباره از درگاه پرداخت کنی یا سفارش رو بازبینی کنی.'],
+      cancelled:['پرداخت لغو شد.','سابقهٔ یادگیری سر جاشه؛ هر وقت خواستی دوباره پرداخت کن.']
+    };
+    const [title,text]=statuses[o.status]||statuses.pending;
+    return `<div class="app-narrow">${head(title,text)}
+      <div class="app-card">
+        ${flowsHtml}
+        <dl class="app-summary"><div><dt>مرحله</dt><dd>${stageName(o.stage)}</dd></div><div><dt>پلن</dt><dd class="en">${o.plan}</dd></div><div><dt>مبلغ</dt><dd>${money(C.prices[o.plan])} تومان</dd></div><div><dt>تمدید خودکار</dt><dd>ندارد</dd></div></dl>
+        ${o.status==='success'
+          ? `<div class="app-actions">${action('ادامهٔ مسیر یادگیری','after-purchase')}${link('مدیریت اشتراک','subscription','outline')}</div>`
+          : o.status==='pending'
+            ? `<div class="app-actions">${action('بررسی نتیجه','payment-state','', 'data-status="success"')}${link('برگشت به سفارش','checkout','outline')}</div>`
+            : `<div class="app-actions">${action('پرداخت دوباره','retry-payment')}${link('بازبینی سفارش','checkout','outline')}</div>`}
+        <p class="checkout-fine">این نسخه نمایشیه و تراکنش واقعی انجام نمی‌ده.</p>
+      </div>
+    </div>`;
   }
   function parent() {
-    return `${head('برای کسی که هزینه رو پرداخت می‌کنه.','والد می‌تونه خریدار باشه؛ زبان‌آموز همچنان صاحب مسیر یادگیری خودشه.')}<div class="app-grid"><div class="app-card"><h2>فرزندت چه مسیری رو می‌ره؟</h2><ul class="app-list"><li><h3>یادگیری کاربردی</h3><p>یه عبارت در موقعیت، تمرین، بازخورد و مرور.</p></li><li><h3>سه مرحلهٔ سه‌ماهه</h3><p>شروع از Silver؛ سپس Gold و Diamond.</p></li><li><h3>پیشرفت قابل مشاهده</h3><p>جلسه‌ها و مرورهای تکمیل‌شده، به‌جای وعدهٔ نتیجهٔ قطعی.</p></li></ul></div><div class="app-card"><h2>قبل از تصمیم خرید</h2><p>انتخاب فعلی: ${stageName(state.selectedStage)} · ${state.selectedPlan}. مبلغ مرحلهٔ سه‌ماهه: ${money(C.prices[state.selectedPlan])} تومان. این صفحه پیش‌نمایش سفارشه.</p>${note('پرداخت هزینه به‌معنای دسترسی خودکار به متن خصوصی مکالمه‌های زبان‌آموز نیست.')}<div class="app-actions">${link('دیدن سفارش نمونه','checkout')}${link('پرسیدن سؤال','support','outline')}</div></div></div>`;
+    return `${head('برای کسی که هزینه رو پرداخت می‌کنه.','والد می‌تونه خریدار باشه؛ زبان‌آموز همچنان صاحب مسیر یادگیری خودشه.')}<div class="app-grid"><div class="app-card"><h2>فرزندت چه مسیری رو می‌ره؟</h2><ul class="app-list"><li><h3>یادگیری کاربردی</h3><p>یه عبارت در موقعیت، تمرین، بازخورد و مرور.</p></li><li><h3>سه مرحلهٔ سه‌ماهه</h3><p>شروع از Silver؛ سپس Gold و Diamond.</p></li><li><h3>پیشرفت قابل مشاهده</h3><p>جلسه‌ها و مرورهای تکمیل‌شده، به‌جای وعدهٔ نتیجهٔ قطعی.</p></li></ul></div><div class="app-card"><h2>قبل از تصمیم خرید</h2><p>انتخاب فعلی: ${stageName(state.selectedStage)} · ${state.selectedPlan}. مبلغ مرحلهٔ سه‌ماهه: ${money(C.prices[state.selectedPlan])} تومان. پرداخت از درگاه آنلاین انجام می‌شه و بعد از تأیید، دسترسی فعال می‌شه.</p>${note('پرداخت هزینه به‌معنای دسترسی خودکار به متن خصوصی مکالمه‌های زبان‌آموز نیست.')}<div class="app-actions">${link('دیدن سفارش نمونه','checkout')}${link('پرسیدن سؤال','support','outline')}</div></div></div>`;
   }
   function assessment() {
     const ready=state.completed.filter(id=>id.startsWith(state.stage+':')).length===3;
@@ -311,7 +392,7 @@
     const authLayout = route === 'login' || route === 'verify';
     const content=pageContent.includes('app-page-title')?pageContent:head(labels[route],'قدم بعدی رو از همین‌جا انتخاب کن.')+pageContent;
     if(authLayout){shell.innerHTML=`<div class="auth-shell">${pageContent}</div>`;window.scrollTo(0,0);bindForms();return;}
-    shell.innerHTML=`<div class="app-layout"><aside class="app-sidebar"><div class="sidebar-caption"><span class="sidebar-monogram en" aria-hidden="true">sf.</span><span>فضای یادگیری تو<small class="en">LET'S GET TALKING</small></span></div>${navItems.map(([r,i,t])=>`<a href="#/${r}" ${r===route?'aria-current="page"':''}><span class="nav-icon">${icon(r)}</span>${t}</a>`).join('')}<div class="sidebar-bottom"><b>${stageName(state.stage)} · ${state.access.length?state.plan:'تجربهٔ رایگان'}</b><p>زبان رو جوری که واقعا هست یادبگیر.</p><a class="app-subtle-link" href="#">بازگشت به لندینگ</a></div></aside><main class="app-workspace" id="app-main"><div class="app-topline"><span>SpeakFlow / ${labels[route]}</span><span class="pill">پروتوتایپ تعاملی · بدون پرداخت و AI زنده</span></div>${content}<footer class="product-footer"><strong>SpeakFlow · هر قدم، یه فرصت برای گفتن</strong><div><a href="#/roadmap">سفر نُه</a><a href="#/profile">پروفایل من</a><a href="#/founder">بنیان‌گذار</a><a href="#/support">پشتیبانی</a></div></footer></main></div><nav class="app-footer-nav" aria-label="منوی فضای یادگیری">${navItems.filter(([r])=>['dashboard','roadmap','review','progress','settings'].includes(r)).map(([r,i,t])=>`<a href="#/${r}" ${r===route?'aria-current="page"':''}><span class="nav-icon">${icon(r)}</span>${t}</a>`).join('')}</nav>`;
+    shell.innerHTML=`<div class="app-layout"><aside class="app-sidebar"><div class="sidebar-caption"><span class="sidebar-monogram en" aria-hidden="true">sf.</span><span>فضای یادگیری تو<small class="en">LET'S GET TALKING</small></span></div>${navItems.map(([r,i,t])=>`<a href="#/${r}" ${r===route?'aria-current="page"':''}><span class="nav-icon">${icon(r)}</span>${t}</a>`).join('')}<div class="sidebar-bottom"><b>${stageName(state.stage)} · ${state.access.length?state.plan:'تجربهٔ رایگان'}</b><p>زبان رو جوری که واقعا هست یادبگیر.</p><a class="app-subtle-link" href="#">بازگشت به لندینگ</a></div></aside><main class="app-workspace" id="app-main"><div class="app-topline"><span>SpeakFlow / ${labels[route]}</span><span class="pill">نسخهٔ نمایشی · بدون تراکنش واقعی</span></div>${content}<footer class="product-footer"><strong>SpeakFlow · هر قدم، یه فرصت برای گفتن</strong><div><a href="#/roadmap">سفر نُه</a><a href="#/profile">پروفایل من</a><a href="#/founder">بنیان‌گذار</a><a href="#/support">پشتیبانی</a></div></footer></main></div><nav class="app-footer-nav" aria-label="منوی فضای یادگیری">${navItems.filter(([r])=>['dashboard','roadmap','review','progress','settings'].includes(r)).map(([r,i,t])=>`<a href="#/${r}" ${r===route?'aria-current="page"':''}><span class="nav-icon">${icon(r)}</span>${t}</a>`).join('')}</nav>`;
     shell.querySelector('.app-page-title')?.focus({preventScroll:true});
     window.scrollTo(0,0);
     bindForms();
@@ -376,8 +457,11 @@
     'preview-review':()=>{reviewId=state.completed[0];reviewReady=false;render();},
     'review-answer':el=>{if(!reviewId)return;const correct=el.dataset.choice==='correct';C.review(state,reviewId,correct);save();reviewReady=correct;const step=C.stepOf(state,reviewId);const next=C.reviewLabels[step];reviewMessage=note(correct?'درسته! مرور بعدی: '+next+'.':currentReviewHelp(),correct?'success':'warning');if(correct){render();return;}$('#review-feedback').innerHTML=reviewMessage;$('#review-next').hidden=true;},
     'review-next':()=>{reviewId=null;reviewReady=false;reviewMessage='';render();},
-    'choose-plan':el=>{state.selectedPlan=el.dataset.plan;go('checkout');},
-    'create-order':()=>{if(!$('#checkout-consent').checked){$('#checkout-feedback').innerHTML=note('نمایشی‌بودن سفارش رو تأیید کن.','warning');return;}state.order={stage:state.selectedStage,plan:state.selectedPlan,status:'preview'};save();go('payment');},
+    'pick-stage':el=>{state.selectedStage=Number(el.dataset.stage);save();render();},
+    'choose-plan':el=>{state.selectedPlan=el.dataset.plan;save();go('checkout');},
+    'create-order':()=>{state.order={stage:state.selectedStage,plan:state.selectedPlan,status:'preview'};save();go('payment');},
+    'pay-gateway':()=>{state.order={stage:state.selectedStage,plan:state.selectedPlan,status:'preview'};save();go('payment');},
+    'retry-payment':()=>{if(state.order&&state.order.status!=='success'){state.order.status='preview';save();go('payment');}},
     'payment-state':el=>{C.payment(state,el.dataset.status);save();render();},
     'after-purchase':()=>{if(state.assessment?.passed&&state.order.stage===state.stage+1){if(C.advance(state))assessmentChoice=null;}viewStage=state.stage;save();go('roadmap');},
     'expire-access':()=>{state.access=[];save();render();},
@@ -391,7 +475,11 @@
   };
   function currentReviewHelp(){const t=topicFor(reviewId);return 'اشکالی نداره؛ «'+esc(t.phrase)+'» رو دوباره بخون و انتخاب کن. مرور زودتر تنظیم شد.';}
   shell.addEventListener('click',event=>{const el=event.target.closest('[data-action]');if(!el)return;const handler=handlers[el.dataset.action];if(handler)handler(el);});
-  document.querySelectorAll('[data-start]').forEach(button=>button.addEventListener('click',()=>{destination='dashboard';go(signedIn?'dashboard':'onboarding');}));
+  document.querySelectorAll('[data-start]').forEach(button=>button.addEventListener('click',()=>{
+    const plan = button.dataset.plan;
+    if (plan) { state.selectedPlan = plan; save(); destination = 'checkout'; go(signedIn ? 'checkout' : 'login'); return; }
+    destination='dashboard';go(signedIn?'dashboard':'onboarding');
+  }));
   const menu=$('#main-nav'); const menuToggle=$('#menu-toggle');
   function closeMenu(){menu.classList.remove('open');menuToggle.setAttribute('aria-expanded','false');}
   menuToggle.addEventListener('click',()=>{const open=menu.classList.toggle('open');menuToggle.setAttribute('aria-expanded',String(open));});

@@ -199,13 +199,23 @@ test('payment failure/pending/cancellation do not unlock; repeated success is id
   assert.equal(C.payment(s, 'nonsense'), false);
 });
 
-test('payment form requires consent and renders all four result states', () => {
-  const a = setup(); a.signIn(); a.route('checkout'); a.click('create-order');
+test('purchase walks plan, gateway, confirmation and access activation in order', () => {
+  const a = setup(); a.signIn(); a.route('subscription');
+  a.click('choose-plan', { plan: 'Medium' }); a.route('checkout');
+  assert.match(a.output(), /پرداخت از درگاه/);
   assert.equal(a.state().order, null);
-  a.elements.get('#checkout-consent').checked = true; a.click('create-order'); a.route('payment');
-  for (const status of ['failed', 'pending', 'cancelled', 'success']) {
-    a.click('payment-state', { status }); assert.match(a.output(), /بدون تراکنش/);
-  }
+  a.click('pay-gateway'); a.route('payment');
+  assert.equal(a.state().order.status, 'preview');
+  assert.match(a.output(), /در حال انتقال به درگاه پرداخت/);
+  a.click('payment-state', { status: 'pending' }); a.route('payment');
+  assert.equal(a.state().order.status, 'pending');
+  assert.match(a.output(), /در حال تأیید پرداخت/);
+  a.click('payment-state', { status: 'success' }); a.route('payment');
+  assert.equal(a.state().order.status, 'success');
+  assert.deepEqual(a.state().access, [0]);
+  assert.match(a.output(), /پرداخت تأیید شد/);
+  assert.match(a.output(), /فعال شد/);
+  assert.match(a.output(), /is-done/);
 });
 
 test('assessment requires practice; failed assessment does not advance; next access required', () => {
@@ -255,8 +265,7 @@ test('choosing an upgrade does not change active plan before payment', () => {
   a.click('choose-plan', { plan: 'Pro' });
   assert.equal(a.state().plan, 'Basic');
   assert.equal(a.state().selectedPlan, 'Pro');
-  a.route('checkout'); a.elements.get('#checkout-consent').checked = true;
-  a.click('create-order'); a.route('payment');
+  a.route('checkout'); a.click('pay-gateway'); a.route('payment');
   a.click('payment-state', { status: 'failed' }); assert.equal(a.state().plan, 'Basic');
   a.click('payment-state', { status: 'success' }); assert.equal(a.state().plan, 'Pro');
 });
@@ -452,6 +461,31 @@ test('review screen shows the ladder with the current step highlighted and advan
   const states = [...out.matchAll(/<li class="([^"]*)"><span class="ladder-dot"/g)].map(m => m[1]);
   assert.equal(states.filter(x => x.includes('is-next')).length, 1);
   assert.equal(states.filter(x => x.includes('is-done')).length, 2);
+});
+
+test('landing plans keep the real prices, add no invented feature list and show the purchase path', () => {
+  const start = html.indexOf('id="plans"');
+  const end = html.indexOf('</section>', start);
+  const plans = html.slice(start, end);
+  for (const price of ['۲٬۶۰۰٬۰۰۰', '۳٬۹۵۰٬۰۰۰', '۵٬۵۰۰٬۰۰۰']) assert.ok(plans.includes(price), price);
+  assert.doesNotMatch(plans, /<ul|<li>مسیر آموزشی|سهمیه|تحلیل عمیق/);
+  assert.equal([...plans.matchAll(/data-plan="(Basic|Medium|Pro)"/g)].length, 3);
+  const steps = [...plans.matchAll(/<strong>([^<]+)<\/strong>/g)].map(m => m[1]);
+  assert.deepEqual(steps, ['انتخاب پلن', 'پرداخت از درگاه', 'تأیید پرداخت', 'فعال شدن دسترسی']);
+  assert.match(plans, /تفاوت دقیق امکانات Basic، Medium و Pro پیش از خرید اعلام می‌شه/);
+});
+
+test('subscription page lets the learner pick a stage and plan without inventing plan differences', () => {
+  const a = setup(); a.signIn(); a.route('subscription');
+  const out = a.output();
+  assert.equal([...out.matchAll(/class="stage-option/g)].length, 3);
+  assert.equal([...out.matchAll(/data-action="choose-plan"/g)].length, 3);
+  assert.doesNotMatch(out, /سهمیه|تحلیل عمیق|ویژگی ویژه/);
+  a.click('pick-stage', { stage: '2' });
+  assert.equal(a.state().selectedStage, 2);
+  a.click('choose-plan', { plan: 'Pro' });
+  assert.equal(a.state().selectedPlan, 'Pro');
+  assert.equal(a.location.hash, '/checkout');
 });
 
 test('no mascot or character art remains anywhere in the product or landing markup', () => {

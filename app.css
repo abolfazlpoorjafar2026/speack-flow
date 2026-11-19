@@ -592,3 +592,82 @@ button.back-chip{font-family:inherit;cursor:pointer;background:#fff}
 .split-list li{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .split-list li small{font-size:11px;color:#7b8c9d;flex:0 0 auto}
 .split-list li.is-muted small{display:none}
+
+/* ---------- PLANS v1: قیمت روشن، مسیر خرید چهارقدمی، بدون ادعای اضافه ---------- */
+.plans .plan-grid{gap:16px;margin-top:34px}
+.plans .plan{padding:26px 24px;border-radius:16px;border:1px solid #0f36661f;background:#fff;gap:0}
+.plans .plan:nth-child(2){background:#fff;color:inherit;border-color:#0f3666;box-shadow:inset 0 3px 0 #0f3666}
+.plans .plan .en{font-size:22px;font-weight:700;color:#0f3666;letter-spacing:-.4px}
+.plans .plan .plan-price{font-size:30px;font-weight:900;letter-spacing:-1px;margin:14px 0 4px;line-height:1.5;color:#0f3666}
+.plans .plan .plan-price small{display:block;font-size:13px;font-weight:500;letter-spacing:0;color:#6b7c8d;margin-top:2px}
+.plans .plan-line{font-size:14px;line-height:1.95;color:#5c6f81;margin:12px 0 22px}
+.plans .plan .button{font-size:14px;width:100%;margin-top:auto;padding:12px 16px}
+.plans .plan:nth-child(2) .button{background:#0f3666;color:#fff}
+.plans .plan:nth-child(2) .button:hover{background:#f4c542;color:#0f3666}
+.pay-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;list-style:none;padding:0;margin:26px 0 0}
+.pay-steps li{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:12px;background:#0f366608;border:1px solid #0f366614}
+.pay-steps li strong{font-size:13.5px;font-weight:600;color:#0f3666}
+.pay-num{flex:0 0 auto;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#0f3666;color:#fff;font-size:12px;line-height:1}
+.plans .plans-note{text-align:right;font-size:13px;line-height:2;color:#6b7c8d;margin-top:18px;max-width:760px}
+@media(max-width:760px){
+  .plans .plan{padding:22px 20px;border-radius:14px}
+  .plans .plan .en{font-size:20px}
+  .plans .plan .plan-price{font-size:26px}
+  .plans .plan-line{font-size:13px;margin:10px 0 18px}
+  .pay-steps{grid-template-columns:1fr 1fr;gap:9px;margin-top:20px}
+  .pay-steps li{padding:11px 12px}
+  .pay-steps li strong{font-size:12.5px}
+  .plans .plans-note{font-size:12px;line-height:1.95}
+}
+
+/* ---------- SUBSCRIPTION v1: انتخاب پلن و مسیر پرداخت، بدون ادعای اضافه ---------- */
+.sub-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px}
+.sub-help{font-size:14px;line-height:2;color:#5c6f81;margin-top:9px}
+.stage-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.stage-option{display:grid;gap:3px;padding:14px 12px;border-radius:14px;background:#fff;border:1px solid #0f36661f;text-align:center;cursor:pointer;font-family:inherit;transition:border-color .18s,background .18s}
+.stage-option:hover{border-color:#0f3666}
+.stage-option.is-on{background:#0f3666;border-color:#0f3666;color:#fff}
+.stage-option strong{font-size:17px;font-weight:700;color:#0f3666}
+.stage-option.is-on strong{color:#f4c542}
+.stage-option small{font-size:11.5px;color:#6b7c8d}
+.stage-option.is-on small{color:#c2d4e6}
+.sub-access{margin-top:16px}
+.sub-now{background:radial-gradient(ellipse at 100% 0%,#f4c54226,transparent 60%),#0f3666;color:#fff;display:grid;align-content:start;gap:0}
+.sub-now .app-kicker{color:#f4c542}
+.sub-now h2{color:#fff;font-size:22px;margin-top:8px}
+.sub-now .sub-help{color:#c2d4e6;font-size:13px;margin-top:8px}
+.sub-total{font-size:32px;font-weight:900;letter-spacing:-1px;color:#fff;margin-top:16px;display:flex;align-items:baseline;gap:7px}
+.sub-total span{font-family:'DM Sans',sans-serif}
+.mini-steps{list-style:none;display:flex;flex-wrap:wrap;gap:7px;padding:0;margin:20px 0 0;counter-reset:step}
+.mini-steps li{font-size:12px;padding:6px 12px;border-radius:20px;background:#ffffff14;border:1px solid #ffffff26;color:#c9d9e8}
+.mini-steps li.is-done{background:#f4c5422e;border-color:#f4c54280;color:#ffe6a8}
+.mini-steps li.is-current{background:#f4c542;border-color:#f4c542;color:#0f3666;font-weight:700}
+.app-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}
+.plan-card{display:flex;flex-direction:column;padding:22px 20px;border-radius:16px;background:#fff;border:1px solid #0f36661f}
+.plan-card.is-on{border-color:#0f3666;box-shadow:inset 0 3px 0 #0f3666}
+.plan-name{font-size:21px;font-weight:700;color:#0f3666;letter-spacing:-.4px}
+.plan-card .plan-price{font-size:26px;font-weight:900;letter-spacing:-.8px;margin:10px 0 2px;line-height:1.5;color:#0f3666}
+.plan-card .plan-price small{display:block;font-size:12px;font-weight:500;letter-spacing:0;color:#6b7c8d;margin-top:2px}
+.plan-line{font-size:13.5px;line-height:1.95;color:#5c6f81;margin:10px 0 18px}
+.plan-card .button{font-size:13.5px;width:100%;margin-top:auto;padding:11px 14px}
+.sub-note{font-size:13px;line-height:2;color:#6b7c8d;margin-top:14px}
+.checkout-fine{font-size:12.5px;line-height:1.95;color:#6b7c8d;margin-top:14px}
+.gateway-line{font-size:13.5px;line-height:2;color:#5c6f81;margin:16px 0 0}
+.mini-steps.is-flow{margin:0 0 20px}
+.mini-steps.is-flow li{background:#0f36660a;border-color:#0f36661a;color:#5c6f81}
+.mini-steps.is-flow li.is-done{background:#0f3666;border-color:#0f3666;color:#fff}
+.mini-steps.is-flow li.is-current{background:#f4c542;border-color:#f4c542;color:#0f3666;font-weight:700}
+@media(max-width:900px){
+  .sub-grid{grid-template-columns:1fr}
+  .app-plans{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .stage-pick{grid-template-columns:1fr 1fr}
+  .stage-pick .stage-option:last-child{grid-column:span 2}
+  .sub-now h2{font-size:20px}
+  .sub-total{font-size:27px}
+  .plan-card{padding:19px 17px}
+  .plan-name{font-size:19px}
+  .plan-card .plan-price{font-size:24px}
+  .sub-help,.plan-line{font-size:13px}
+}
