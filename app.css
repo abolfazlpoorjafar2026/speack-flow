@@ -671,3 +671,116 @@ button.back-chip{font-family:inherit;cursor:pointer;background:#fff}
   .plan-card .plan-price{font-size:24px}
   .sub-help,.plan-line{font-size:13px}
 }
+
+/* ---------- ONBOARD v1: سه سؤال، هر کدام در یک مرحلهٔ خلوت ---------- */
+.onboard-shell{min-height:calc(100dvh - 75px);display:grid;align-items:center;padding:34px 22px 46px;background:linear-gradient(180deg,#fffdf6,#ffffff 60%)}
+.onboard-top{width:min(600px,100%);margin:0 auto}
+.onboard-form{display:flex;flex-direction:column;min-height:min(520px,calc(100dvh - 150px));gap:0}
+.onboard-progress{display:flex;align-items:center;gap:14px}
+.onboard-bar{flex:1;height:4px;border-radius:20px;background:#0f366614;overflow:hidden}
+.onboard-bar>span{display:block;height:100%;background:#f4c542;border-radius:20px;transition:width .35s ease}
+.onboard-count{font-size:12.5px;color:#6b7c8d;white-space:nowrap}
+.onboard-body{padding:44px 0 0;flex:1}
+.onboard-eyebrow{font-size:12px;font-weight:600;color:#9a7a1f;letter-spacing:.2px}
+.onboard-title{font-size:clamp(25px,3.4vw,34px);font-weight:800;letter-spacing:-1px;line-height:1.55;color:#0f3666;margin:12px 0 0}
+.onboard-hint{font-size:14.5px;line-height:2;color:#6b7c8d;margin-top:12px;max-width:470px}
+.onboard-options{display:grid;gap:10px;margin-top:30px}
+.onboard-choice{display:flex;align-items:center;gap:14px;width:100%;padding:17px 19px;border-radius:14px;background:#fff;border:1px solid #0f366620;font-family:inherit;font-size:16px;line-height:1.7;color:#173552;text-align:right;cursor:pointer;transition:border-color .18s,background .18s,box-shadow .18s}
+.onboard-choice:hover{border-color:#0f366680}
+.onboard-choice.is-on{border-color:#0f3666;background:#fffbee;box-shadow:inset 4px 0 0 #f4c542;font-weight:700}
+.choice-mark{flex:0 0 auto;width:21px;height:21px;border-radius:50%;border:2px solid #0f36663d;display:grid;place-items:center;transition:border-color .18s,background .18s}
+.onboard-choice.is-on .choice-mark{border-color:#0f3666;background:#0f3666}
+.onboard-choice.is-on .choice-mark:after{content:'';width:7px;height:7px;border-radius:50%;background:#f4c542}
+.onboard-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:26px}
+.onboard-back{background:transparent;border:0;font-family:inherit;font-size:14px;color:#6b7c8d;padding:12px 6px;cursor:pointer}
+.onboard-back:hover{color:#0f3666}
+.onboard-next{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-width:190px;min-height:52px;padding:13px 26px;border:0;border-radius:14px;background:#f4c542;color:#0f3666;font-family:inherit;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 4px 0 #0f3666;transition:transform .18s,box-shadow .18s,background .18s}
+.onboard-next:hover{transform:translateY(-2px);box-shadow:0 6px 0 #0f3666}
+.onboard-next:active{transform:translateY(2px);box-shadow:0 1px 0 #0f3666}
+.onboard-next:focus-visible{outline:3px solid #0f3666;outline-offset:4px}
+@media(max-width:760px){
+  .onboard-shell{min-height:calc(100dvh - 68px);padding:22px 18px calc(24px + env(safe-area-inset-bottom));align-items:stretch}
+  .onboard-form{min-height:calc(100dvh - 120px)}
+  .onboard-body{padding:30px 0 0}
+  .onboard-title{font-size:24px}
+  .onboard-hint{font-size:13.5px;margin-top:10px}
+  .onboard-options{margin-top:22px;gap:9px}
+  .onboard-choice{padding:15px 16px;font-size:15px;border-radius:12px}
+  .onboard-actions{position:sticky;bottom:0;background:linear-gradient(180deg,#ffffff00,#ffffff 38%);padding:20px 0 6px;margin-top:auto}
+  .onboard-next{flex:1;min-width:0;min-height:50px;font-size:15px}
+  .onboard-back{font-size:13px}
+}
+
+/* ---------- PRACTICE HUB v1: درس فعلی در مرکز، مسیر تمرین و مرورهای نزدیک ---------- */
+.hub{display:grid;gap:16px}
+.hub-now{padding:26px 28px;border-radius:22px;background:radial-gradient(ellipse at 100% 0%,#f4c5422e,transparent 58%),#0f3666;color:#fff}
+.hub-now-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.hub-chip{font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:20px;background:#f4c542;color:#0f3666}
+.hub-stage{font-size:12.5px;color:#b9cde2}
+.hub-now-main{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:22px;align-items:end;margin-top:18px}
+.hub-now-copy h2{font-size:clamp(24px,3vw,32px);letter-spacing:-1px;line-height:1.5;color:#fff;margin:0}
+.hub-now-copy p{font-size:14.5px;line-height:2;color:#c2d4e6;margin-top:9px;max-width:520px}
+.hub-now-cta{display:grid;gap:8px;justify-items:start}
+.hub-now-cta .button{font-size:15px;padding:13px 24px;white-space:nowrap}
+.hub-cta-line{font-size:12px;color:#b9cde2}
+.hub-progress{margin-top:22px;padding-top:18px;border-top:1px solid #ffffff1f}
+.hub-progress-head{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;color:#c2d4e6}
+.hub-progress-head b{color:#fff;font-weight:700}
+.hub-bar{height:7px;border-radius:20px;background:#ffffff1f;overflow:hidden;margin-top:9px}
+.hub-bar>span{display:block;height:100%;background:#f4c542;border-radius:20px;transition:width .35s}
+.hub-track-wrap{padding:22px 26px;border-radius:20px;background:#fff;border:1px solid #0f366618}
+.hub-track-wrap h3{font-size:17px;color:#0f3666;margin:0}
+.practice-track{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));list-style:none;padding:0;margin:20px 0 0;position:relative;isolation:isolate}
+.practice-track:before{content:'';position:absolute;top:15px;right:6%;left:6%;height:2px;background:#0f36661a;z-index:-1}
+.practice-track li{display:grid;justify-items:center;gap:9px;text-align:center;min-width:0}
+.track-dot{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid #0f366626;color:#7b8c9d;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700}
+.practice-track li.is-done .track-dot{background:#0f3666;border-color:#0f3666;color:#f4c542}
+.practice-track li.is-now .track-dot{background:#f4c542;border-color:#0f3666;color:#0f3666;box-shadow:0 0 0 5px #f4c54233}
+.practice-track small{font-size:11.5px;color:#7b8c9d;line-height:1.5}
+.practice-track li.is-done small{color:#0f3666}
+.practice-track li.is-now small{color:#0f3666;font-weight:700}
+.hub-track-note{font-size:13px;color:#6b7c8d;margin-top:16px}
+.hub-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.hub-review,.hub-topics{padding:22px 24px;border-radius:20px;background:#fff;border:1px solid #0f366618}
+.hub-review-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hub-review h3,.hub-topics h3{font-size:17px;color:#0f3666;margin:0}
+.hub-count{font-size:11.5px;padding:4px 10px;border-radius:20px;background:#f4c5422e;color:#8a6a13;font-weight:600}
+.hub-review-list{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:2px}
+.hub-review-list li{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#173552;padding:9px 0;border-bottom:1px solid #0f36660f}
+.hub-review-list li:last-child{border-bottom:0}
+.hub-review-list small{margin-inline-start:auto;font-size:11.5px;color:#7b8c9d}
+.hub-review-dot{width:8px;height:8px;border-radius:50%;background:#f4c542;flex:0 0 auto}
+.hub-empty{font-size:13px;color:#7b8c9d;margin-top:14px;line-height:1.9}
+.hub-topic-list{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:0}
+.hub-topic-list li{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#173552;padding:10px 0;border-bottom:1px solid #0f36660f}
+.hub-topic-list li:last-child{border-bottom:0}
+.hub-topic-list li.is-done{color:#0f3666;font-weight:600}
+.hub-topic-list small{margin-inline-start:auto;font-size:11.5px;color:#9aa8b5}
+.hub-topic-state{width:18px;height:18px;border-radius:50%;border:1.5px solid #0f366626;display:grid;place-items:center;font-size:10px;color:#f4c542;background:#fff;flex:0 0 auto}
+.hub-topic-list li.is-done .hub-topic-state{background:#0f3666;border-color:#0f3666}
+.hub-topic-start{margin-inline-start:auto;font-family:inherit;font-size:12px;padding:5px 13px;border-radius:20px;background:#f4c542;border:0;color:#0f3666;font-weight:700;cursor:pointer}
+.hub-topic-start:hover{background:#ffd75e}
+.hub-session{display:grid;gap:0}
+.practice-card-main{padding:26px}
+@media(max-width:900px){
+  .hub-now-main{grid-template-columns:1fr;align-items:start;gap:16px}
+  .hub-split{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .hub-now{padding:20px 18px;border-radius:18px}
+  .hub-now-copy h2{font-size:23px}
+  .hub-now-copy p{font-size:13.5px}
+  .hub-now-cta{justify-items:stretch}
+  .hub-now-cta .button{width:100%;font-size:14px}
+  .hub-progress{margin-top:18px;padding-top:15px}
+  .hub-track-wrap{padding:18px 17px;border-radius:16px}
+  .hub-track-wrap h3{font-size:15.5px}
+  .practice-track{grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-top:16px}
+  .track-dot{width:27px;height:27px;font-size:11px}
+  .practice-track small{font-size:9.5px}
+  .practice-track:before{top:13px;right:4%;left:4%}
+  .hub-track-note{font-size:12.5px;margin-top:13px}
+  .hub-review,.hub-topics{padding:18px 17px;border-radius:16px}
+  .hub-review h3,.hub-topics h3{font-size:15.5px}
+  .practice-card-main{padding:20px 18px}
+}

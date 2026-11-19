@@ -18,6 +18,7 @@
   let viewStage = state.stage;
   let practiceError = false;
   let practiceMode = 'text';
+  let onboardStep = 0;
   let screen = 'dashboard';
   const iconPaths = {
     profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
@@ -59,7 +60,7 @@
   const topicFor = id => C.topics[id.split(':')[1]];
   const current = () => state.session ? topicFor(state.session.id) : C.topics[state.preferences.interest];
   const navItems = [['dashboard','⌂','امروز من'],['roadmap','↗','سفر نُه'],['review','↶','مرور'],['progress','▥','پیشرفت من'],['subscription','◇','اشتراک من'],['profile','◎','پروفایل من'],['founder','◇','استاد و بنیان‌گذار'],['settings','⚙','تنظیمات'],['support','؟','پشتیبانی']];
-  const labels = { profile:'پروفایل هنرجو',founder:'استاد و بنیان‌گذار', onboarding:'شروع مسیر', login:'ورود و ثبت‌نام', verify:'تأیید شماره', dashboard:'امروز من', roadmap:'سفر نُه · نقشهٔ ۹ماهه', lesson:'درس کوتاه', practice:'مکالمه', analysis:'بازخورد جلسه', review:'مرور', progress:'پیشرفت', subscription:'اشتراک‌ها', checkout:'خلاصه سفارش', payment:'وضعیت پرداخت', parent:'راهنمای والد', assessment:'ارزیابی مرحله', result:'نتیجه ارزیابی', settings:'تنظیمات', support:'پشتیبانی', privacy:'حریم خصوصی', completion:'پایان مسیر' };
+  const labels = { profile:'پروفایل هنرجو',founder:'استاد و بنیان‌گذار', onboarding:'شروع مسیر', login:'ورود و ثبت‌نام', verify:'تأیید شماره', dashboard:'امروز من', roadmap:'سفر نُه · نقشهٔ ۹ماهه', lesson:'درس کوتاه', practice:'پارتنر مکالمه', analysis:'بازخورد جلسه', review:'مرور', progress:'پیشرفت', subscription:'اشتراک‌ها', checkout:'خلاصه سفارش', payment:'وضعیت پرداخت', parent:'راهنمای والد', assessment:'ارزیابی مرحله', result:'نتیجه ارزیابی', settings:'تنظیمات', support:'پشتیبانی', privacy:'حریم خصوصی', completion:'پایان مسیر' };
   function field(label, name, options, value) { return `<label class="app-field">${label}<select name="${name}">${options.map(([v,t]) => `<option value="${v}" ${value === v ? 'selected' : ''}>${t}</option>`).join('')}</select></label>`; }
   const interestField = () => field('کدوم موقعیت برات جذاب‌تره؟','interest',Object.entries(C.topics).map(([k,v])=>[k,v.title]),state.preferences.interest);
   const goalField = () => field('بیشتر برای چی زبان می‌خونی؟','goal',[['daily','استفاده در زندگی روزمره'],['travel','سفر و آشنایی با آدم‌ها'],['work','کار و آیندهٔ شغلی']],state.preferences.goal);
@@ -102,8 +103,50 @@
   function founder(){
     return `${head('آدم پشت این مسیر رو بشناس.','ابوالفضل پورجعفر؛ بنیان‌گذار SpeakFlow و طراح مسیر یادگیری.')}<div class="app-grid"><section class="app-card founder-profile"><div class="founder-avatar" aria-label="آواتار نوشتاری ابوالفضل">ا پ</div><h2>ابوالفضل پورجعفر</h2><span class="app-badge">بنیان‌گذار · راهنمای مسیر آموزش</span><p>از بچگی کمک‌کردن رو دوست داشتم. علاقه‌م به زبان رو با روش‌های جذاب یادگیری کنار هم گذاشتم تا چیزی که یاد می‌گیری، واقعاً به کارت بیاد.</p><div class="app-actions">${link('ببین مسیر چطور کار می‌کنه','roadmap')}</div></section><section class="app-card"><h2>فلسفهٔ آموزش ما</h2><ul class="app-list"><li><h3>یاد بگیر تا استفاده کنی</h3><p>هر عبارت توی یه موقعیت معنی پیدا می‌کنه.</p></li><li><h3>اشتباه، بخشی از راهه</h3><p>بازخورد باید کمک کنه جملهٔ بعدی رو بهتر بگی.</p></li><li><h3>بدون سردرگمی ادامه بده</h3><p>سفر نُه: Silver، Gold و Diamond، هر کدوم سه ماه.</p></li></ul></section></div>`;
   }
+  const onboardQuestions = [
+    {
+      key: 'goal', title: 'این مسیر رو برای چی می‌خوای؟',
+      hint: 'با جوابت، مثال‌های تمرین رو به زندگی خودت نزدیک‌تر می‌کنیم.',
+      options: [['daily','برای زندگی روزمره'],['travel','برای سفر و آشنا شدن'],['work','برای کار و آینده']]
+    },
+    {
+      key: 'experience', title: 'الان با انگلیسی چطوری؟',
+      hint: 'این تعیین سطح نیست؛ فقط می‌خوایم از جای درست شروع کنی.',
+      options: [['new','تازه شروع کردم'],['some','قبلاً خوندم، کم تمرین کردم'],['practice','می‌فهمم، می‌خوام حرف بزنم']]
+    },
+    {
+      key: 'interest', title: 'دوست داری دربارهٔ چی تمرین کنی؟',
+      hint: 'اولین موقعیت‌های تمرینت از همین‌جا انتخاب می‌شن.',
+      options: [['cafe','سفارش توی کافه'],['film','حرف‌زدن دربارهٔ فیلم'],['travel','پیدا کردن مسیر']]
+    }
+  ];
   function onboarding() {
-    return `<div class="app-narrow">${head('مسیرت رو به خودت نزدیک کن.','سه سؤال کوتاه؛ همه از Silver شروع می‌کنیم.')}<form id="onboarding-form" class="app-card">${goalField()}${experienceField()}${interestField()}<div class="app-actions">${action('ادامه و ساخت حساب نمونه','submit-onboarding')}</div><div class="app-form-footer">پاسخ‌ها روی همین مرورگر می‌مونن. این سؤال‌ها تعیین سطح نیستن.</div></form></div>`;
+    const step = onboardStep;
+    const q = onboardQuestions[step];
+    const current = state.preferences[q.key];
+    const pct = Math.round((step + 1) / onboardQuestions.length * 100);
+    const isLast = step === onboardQuestions.length - 1;
+    const choiceField = (question, chosen) => `<div class="onboard-options" role="radiogroup" aria-label="${esc(question.title)}">${question.options.map(([value,label]) => `<button type="button" class="onboard-choice ${chosen === value ? 'is-on' : ''}" role="radio" aria-checked="${chosen === value}" data-action="onboard-pick" data-key="${question.key}" data-value="${value}"><span class="choice-mark" aria-hidden="true"></span><span>${label}</span></button>`).join('')}</div>`;
+    return `<div class="onboard-shell">
+      <div class="onboard-top">
+        <form id="onboarding-form" class="onboard-form">
+          <div class="onboard-progress">
+            <div class="onboard-bar"><span style="width:${pct}%"></span></div>
+            <span class="onboard-count">${faDigits(step + 1)} از ${faDigits(onboardQuestions.length)}</span>
+          </div>
+          <div class="onboard-body">
+            <p class="onboard-eyebrow">شروع مسیر خودت</p>
+            <h1 class="onboard-title" tabindex="-1">${esc(q.title)}</h1>
+            <p class="onboard-hint">${esc(q.hint)}</p>
+            ${choiceField(q, current)}
+          </div>
+          <div class="onboard-actions">
+            ${step > 0 ? '<button type="button" class="onboard-back" data-action="onboard-back">قبلی</button>' : '<span></span>'}
+            <button type="submit" class="onboard-next">${isLast ? 'شروع کنیم' : 'ادامه'}<span aria-hidden="true">←</span></button>
+          </div>
+        </form>
+      </div>
+    </div>`;
   }
   function login() {
     const nameBlock = authMode === 'login'
@@ -237,10 +280,111 @@
     if(step==='speak') body=`<div class="phrase-card"><div class="en" lang="en">${t.phrase}</div><p>${t.meaning}</p></div><h3>یک بار با صدای خودت بگو.</h3><p>آرام تکرار کن و به ترتیب کلمه‌ها دقت کن. توی این نمونه صدات ضبط یا امتیازدهی نمی‌شه.</p><div class="app-actions">${action('تکرار کردم؛ بریم توی موقعیت','lesson-practice')}${action('ادامه با تمرین متنی','lesson-practice','outline')}</div>`;
     return `<div class="app-narrow">${head(t.title,'Silver نقطهٔ شروعه؛ این درس ساختار چهارگامی مسیر رو نشون می‌ده.')}${steps(['learn','recall','speak'].indexOf(step))}<div class="app-card">${body}</div><div class="app-actions">${link('بعداً ادامه می‌دم','dashboard','outline')}</div></div>`;
   }
+  const sessionStage = step => step === 'learn' || step === 'recall' ? 0 : step === 'speak' ? 1 : step === 'practice' ? 2 : 3;
+  function practiceTrack(activeStep) {
+    const items = ['درس فعلی','تمرین تایپی','تمرین صوتی','تمرین در موقعیت','مرور'];
+    return `<ol class="practice-track" aria-label="مراحل تمرین">${items.map((label,i)=>`<li class="${i<activeStep?'is-done':i===activeStep?'is-now':''}"><span class="track-dot" aria-hidden="true">${i<activeStep?'✓':faDigits(i+1)}</span><small>${label}</small></li>`).join('')}</ol>`;
+  }
+  function practiceHub() {
+    const stage = state.stage;
+    const nextTopic = Object.keys(C.topics).find(t => !state.completed.includes(C.lessonId(stage,t))) || state.preferences.interest;
+    const t = state.session ? current() : C.topics[nextTopic];
+    const inSession = Boolean(state.session);
+    const step = inSession ? sessionStage(state.session.step) : 0;
+    const done = Object.keys(C.topics).filter(k => state.completed.includes(C.lessonId(stage,k)));
+    const due = C.due(state);
+    const dueSoon = state.completed.filter(id => !due.includes(id)).slice(0,3);
+    const cta = state.session
+      ? (state.session.step === 'analysis' ? action('دیدن بازخورد جلسه','resume') : action('ادامهٔ تمرین','resume'))
+      : action('شروع درس: ' + t.title,'start','',`data-topic="${nextTopic}" data-stage="${stage}"`);
+    const ctaLine = state.session
+      ? `قدم بعدی: ${state.session.step === 'learn' ? 'خوندن جمله' : state.session.step === 'recall' ? 'بازنویسی جمله' : state.session.step === 'speak' ? 'گفتن با صدای بلند' : state.session.step === 'practice' ? 'استفاده توی موقعیت' : 'دیدن بازخورد'}`
+      : `قدم بعدی: ${esc(t.title)}`;
+    return `<div class="hub">
+      <section class="hub-now" aria-label="درس فعلی">
+        <div class="hub-now-top">
+          <span class="hub-chip">${inSession ? 'جلسهٔ در جریان' : 'درس فعلی'}</span>
+          <span class="hub-stage">${stageName(stage)} · ماه ${faDigits(stage*3+1)} تا ${faDigits(stage*3+3)}</span>
+        </div>
+        <div class="hub-now-main">
+          <div class="hub-now-copy">
+            <h2>${esc(t.title)}</h2>
+            <p>${esc(t.context)}</p>
+          </div>
+          <div class="hub-now-cta">
+            ${cta}
+            <span class="hub-cta-line">${ctaLine}</span>
+          </div>
+        </div>
+        <div class="hub-progress">
+          <div class="hub-progress-head"><span>پیشرفت این مرحله</span><b>${faDigits(done.length)} از ۳ موقعیت</b></div>
+          <div class="hub-bar"><span style="width:${Math.round(Math.min(done.length,3)/3*100)}%"></span></div>
+        </div>
+      </section>
+      <section class="hub-track-wrap" aria-label="مسیر تمرین">
+        <h3>این جلسه چطور جلو می‌ره</h3>
+        ${practiceTrack(step)}
+        <div class="hub-track-note">
+          ${done.length
+            ? `تا حالا ${faDigits(done.length)} موقعیت این مرحله رو تمرین کردی.`
+            : 'هنوز موقعیتی توی این مرحله تمرین نشده.'}
+          ${done.length && done.length < 3 ? ` ${faDigits(3 - done.length)} موقعیت دیگه مونده.` : ''}
+        </div>
+      </section>
+      <div class="hub-split">
+        <section class="hub-review" aria-label="مرورهای نزدیک">
+          <div class="hub-review-head"><h3>مرورهای نزدیک</h3><span class="hub-count">${faDigits(due.length)} سررسیدشده</span></div>
+          ${due.length || dueSoon.length
+            ? `<ul class="hub-review-list">${(due.length ? due : dueSoon).slice(0,3).map(id => `<li><span class="hub-review-dot" aria-hidden="true"></span><span>${esc(topicFor(id).title)}</span><small>${due.includes(id) ? 'همین حالا' : 'در نوبت بعد'}</small></li>`).join('')}</ul>`
+            : '<p class="hub-empty">بعد از اولین تمرین، مرورها این‌جا ظاهر می‌شن.</p>'}
+          <div class="app-actions">${link('برنامهٔ مرور','review','outline')}</div>
+        </section>
+        <section class="hub-topics" aria-label="موقعیت‌های این مرحله">
+          <h3>موقعیت‌های ${stageName(stage)}</h3>
+          <ul class="hub-topic-list">
+            ${Object.entries(C.topics).map(([key, topic]) => {
+              const isDone = state.completed.includes(C.lessonId(stage,key));
+              const available = C.canStart(state, stage, key);
+              return `<li class="${isDone?'is-done':''}">
+                <span class="hub-topic-state" aria-hidden="true">${isDone?'✓':''}</span>
+                <span>${esc(topic.title)}</span>
+                ${available ? (isDone ? '' : `<button type="button" class="hub-topic-start" data-action="start" data-stage="${stage}" data-topic="${key}">شروع</button>`) : '<small>بعداً</small>'}
+              </li>`;
+            }).join('')}
+          </ul>
+        </section>
+      </div>
+    </div>`;
+  }
   function practice() {
-    if(!state.session || !['practice','analysis'].includes(state.session.step)) return empty('اول جمله رو یاد بگیر.','بعد از درس کوتاه، همون عبارت رو توی موقعیت استفاده می‌کنی.',link('ادامهٔ درس','lesson'));
+    if(!state.session) return head('پارتنر مکالمه','امروز این‌جایی؛ فقط همون قدم بعدی رو بردار.') + practiceHub();
     const t=current();
-    return `${head('حالا نوبت توئه.','سناریوی هدایت‌شدهٔ نمونه؛ پاسخ‌ها آماده‌ان و گفت‌وگوی زندهٔ AI نیست.')}${steps(3)}<div class="app-grid"><div class="app-card"><div class="app-row"><h2>${t.title}</h2><span class="pill">پارتنر نمونه</span></div><div class="bubble" style="margin:25px 0;max-width:100%"><span class="speaker">YOUR PARTNER</span>${t.question}</div><p>${t.context}</p><div class="answer-options">${[t.phrase,t.wrong].map((text,i)=>`<button class="app-choice en" data-action="practice-choice" data-choice="${i===0?'correct':'retry'}" aria-pressed="${state.session.choice===(i===0?'correct':'retry')}" lang="en">${text}</button>`).join('')}</div>${practiceError ? note('ارتباط در حالت آزمایشی قطع شد. پاسخت حفظ شده؛ دوباره تلاش کن یا به داشبورد برگرد.','warning') : ''}<div class="app-actions">${action(practiceError?'تلاش دوباره':'پایان و دیدن بازخورد','end-practice')}</div></div><aside class="app-stack"><div class="app-card"><h2>یه فضای امن برای تمرین</h2><p>لازم نیست از اول بی‌نقص باشی. اگر گیر کردی، به عبارت درس برگرد.</p><div class="app-actions">${action('دیدن راهنما','practice-help','outline')}${action('تمرین صوتی','voice-mode','outline')}</div><div id="practice-help" role="status"></div>${practiceMode==='voice'?note('در محصول نهایی اینجا اجازهٔ میکروفون گرفته می‌شه. برای این نمونه، جمله رو بلند بگو و پاسخ متنی رو انتخاب کن. صدایی ضبط نمی‌شه.') : ''}</div><div class="app-card"><h3>جلسه‌ات نیمه‌تمام بمونه؟</h3><p>می‌تونی از داشبورد به همین نقطه برگردی.</p><div class="app-actions">${link('بعداً ادامه می‌دم','dashboard','outline')}</div></div><details class="app-demo-controls"><summary>بررسی حالت خطای ارتباط</summary>${action('نمایش قطع ارتباط','network-error','outline')}</details></aside></div>`;
+    const step = sessionStage(state.session.step);
+    if (state.session.step === 'learn' || state.session.step === 'recall' || state.session.step === 'speak') return lesson();
+    return head('در حال تمرین','تمرینت رو تموم کن و بازخوردش رو ببین.') + `<div class="hub-session">
+      ${practiceTrack(step)}
+      <div class="app-grid" style="margin-top:20px">
+        <div class="app-card practice-card-main">
+          <div class="app-row"><h2>${esc(t.title)}</h2><span class="pill">پارتنر نمونه</span></div>
+          <div class="bubble" style="margin:22px 0;max-width:100%"><span class="speaker">YOUR PARTNER</span>${esc(t.question)}</div>
+          <p>${esc(t.context)}</p>
+          <div class="answer-options">${[t.phrase,t.wrong].map((text,i)=>`<button class="app-choice en" data-action="practice-choice" data-choice="${i===0?'correct':'retry'}" aria-pressed="${state.session.choice===(i===0?'correct':'retry')}" lang="en">${text}</button>`).join('')}</div>
+          ${practiceError ? note('ارتباط در حالت آزمایشی قطع شد. پاسخت حفظ شده؛ دوباره تلاش کن یا به داشبورد برگرد.','warning') : ''}
+          <div class="app-actions">${action(practiceError?'تلاش دوباره':'پایان و دیدن بازخورد','end-practice')}</div>
+        </div>
+        <aside class="app-stack">
+          <div class="app-card">
+            <h3>گیر کردی؟</h3>
+            <p>لازم نیست از اول بی‌نقص باشی. عبارت درس رو دوباره ببین و برگرد.</p>
+            <div class="app-actions">${action('دیدن راهنما','practice-help','outline')}${action('تمرین صوتی','voice-mode','outline')}</div>
+            <div id="practice-help" role="status"></div>
+            ${practiceMode==='voice'?note('در محصول نهایی این‌جا اجازهٔ میکروفون گرفته می‌شه. برای این نمونه، جمله رو بلند بگو و پاسخ متنی رو انتخاب کن. صدایی ضبط نمی‌شه.'):''}
+          </div>
+          <div class="app-card"><h3>جلسه‌ات نیمه‌تمام بمونه؟</h3><p>از همین‌جا می‌تونی برگردی؛ چیزی پاک نمی‌شه.</p><div class="app-actions">${link('بعداً ادامه می‌دم','dashboard','outline')}</div></div>
+          <details class="app-demo-controls"><summary>بررسی حالت خطای ارتباط</summary>${action('نمایش قطع ارتباط','network-error','outline')}</details>
+        </aside>
+      </div>
+    </div>`;
   }
   function analysis() {
     if(!state.session || state.session.step!=='analysis') return empty('هنوز جلسه‌ای تموم نشده.','بعد از تمرین، بازخورد همون جلسه رو اینجا می‌بینی.',link('رفتن به مسیر','roadmap'));
@@ -389,6 +533,7 @@
     shell.setAttribute('data-screen',route);
     document.title=labels[route]+' | SpeakFlow';
     const pageContent=pages[route]();
+    if (route === 'onboarding') { shell.innerHTML = pageContent; window.scrollTo(0, 0); bindForms(); return; }
     const authLayout = route === 'login' || route === 'verify';
     const content=pageContent.includes('app-page-title')?pageContent:head(labels[route],'قدم بعدی رو از همین‌جا انتخاب کن.')+pageContent;
     if(authLayout){shell.innerHTML=`<div class="auth-shell">${pageContent}</div>`;window.scrollTo(0,0);bindForms();return;}
@@ -425,13 +570,22 @@
       signedIn = true; save(); go(destination);
     });
     $('#onboarding-form')?.addEventListener('change',event=>{if(['goal','experience','interest'].includes(event.target.name)){state.preferences[event.target.name]=event.target.value;save();}});
-    $('#onboarding-form')?.addEventListener('submit',event=>{event.preventDefault();const d=new FormData(event.target);for(const key of ['goal','experience','interest'])state.preferences[key]=d.get(key);save();authMode='signup';destination='dashboard';go('login');});
+    $('#onboarding-form')?.addEventListener('submit',event=>{
+      event.preventDefault();
+      const q = onboardQuestions[onboardStep];
+      const answer = event.target?.values?.[q.key] ?? state.preferences[q.key];
+      state.preferences[q.key] = answer; save();
+      if (onboardStep < onboardQuestions.length - 1) { onboardStep++; render(); return; }
+      onboardStep = 0; authMode='signup'; destination='dashboard'; go('login');
+    });
     $('#settings-form')?.addEventListener('submit',event=>{event.preventDefault();const d=new FormData(event.target);for(const key of ['goal','interest','minutes'])state.preferences[key]=d.get(key);state.preferences.reminder=d.has('reminder');save();$('#settings-feedback').innerHTML=note('ترجیح‌هات در همین مرورگر ذخیره شد.','success');});
     $('#recall-form')?.addEventListener('submit',event=>{event.preventDefault();const value=new FormData(event.target).get('answer');const ok=normalize(value)===normalize(current().phrase);$('#recall-feedback').innerHTML=ok?note('درسته؛ حالا یه بار با صدای خودت تکرارش کن.','success')+action('ادامه به تکرار گفتاری','lesson-speak'):note('دوباره امتحان کن. عبارت نمونه: <bdi lang="en">'+esc(current().phrase)+'</bdi>','warning');});
     $('#support-form')?.addEventListener('submit',event=>{event.preventDefault();supportDraft=true;$('#support-feedback').innerHTML=note('پیش‌نمایش درخواست آماده شد؛ ارسال واقعی انجام نشده. برای اتصال پشتیبانی به سرویس نیاز داریم.','success');});
     $('select[name="stage"]')?.addEventListener('change',event=>{state.selectedStage=Number(event.target.value);});
   }
   const handlers={
+    'onboard-pick':el=>{const k=el.dataset.key,v=el.dataset.value;if(k)state.preferences[k]=v;save();render();},
+    'onboard-back':()=>{if(onboardStep>0){onboardStep--;render();}},
     'submit-onboarding':()=>{},'submit-settings':()=>{},'submit-recall':()=>{},'submit-support':()=>{},
     'toggle-auth':()=>{authMode=authMode==='login'?'signup':'login';authStatus='';render();},
     'demo-login':()=>{authProfile={name:'حساب نمایشی',phone:''};signedIn=true;save();go(destination);},

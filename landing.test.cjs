@@ -83,9 +83,26 @@ test('all CTAs enter onboarding and protected deep links retain destination', ()
   assert.equal(a.location.hash, '/review');
 });
 
-test('onboarding preserves known selections and does not change learning stage', () => {
+test('onboarding asks one question per step, records each choice and keeps the stage at Silver', () => {
   const a = setup(); a.route('onboarding');
-  const form = a.elements.get('#onboarding-form'); form.values = { goal: 'work', experience: 'new', interest: 'film' };
+  const first = a.output();
+  assert.match(first, /class="onboard-shell"/);
+  assert.match(first, /۱ از ۳/);
+  assert.equal([...first.matchAll(/class="onboard-choice/g)].length, 3);
+  assert.doesNotMatch(first, /class="app-card"/);
+  a.click('onboard-pick', { key: 'goal', value: 'work' });
+  assert.equal(a.state().preferences.goal, 'work');
+  assert.match(a.output(), /is-on/);
+  let form = a.elements.get('#onboarding-form'); form.values = { goal: 'work' };
+  form.fire('submit', { target: form });
+  assert.match(a.output(), /۲ از ۳/);
+  a.click('onboard-pick', { key: 'experience', value: 'new' });
+  form = a.elements.get('#onboarding-form'); form.values = { experience: 'new' };
+  form.fire('submit', { target: form });
+  assert.match(a.output(), /۳ از ۳/);
+  assert.match(a.output(), /شروع کنیم/);
+  a.click('onboard-pick', { key: 'interest', value: 'film' });
+  form = a.elements.get('#onboarding-form'); form.values = { interest: 'film' };
   form.fire('submit', { target: form });
   assert.equal(a.state().preferences.interest, 'film');
   assert.equal(a.state().preferences.goal, 'work');
@@ -290,6 +307,12 @@ test('every product page has its own visual identity and accessible heading', ()
       assert.doesNotMatch(a.output(), /undefined|null/);
       continue;
     }
+    if (route === 'onboarding') {
+      assert.match(a.output(), /class="onboard-shell"/);
+      assert.match(a.output(), /class="onboard-title" tabindex="-1"/);
+      assert.doesNotMatch(a.output(), /undefined|null/);
+      continue;
+    }
     assert.match(a.output(), /class="page-caption"/);
     assert.match(a.output(), /class="app-page-title" tabindex="-1"/);
     assert.doesNotMatch(a.output(), /buddy\.svg|buddy-scene|page-emblem/);
@@ -486,6 +509,36 @@ test('subscription page lets the learner pick a stage and plan without inventing
   a.click('choose-plan', { plan: 'Pro' });
   assert.equal(a.state().selectedPlan, 'Pro');
   assert.equal(a.location.hash, '/checkout');
+});
+
+test('practice hub centers the current lesson, shows the five-step track and nearby reviews', () => {
+  const s = C.initial();
+  C.start(s, 0, 'cafe'); s.session.step = 'analysis'; C.finish(s, Date.now() - 2 * 86400000);
+  const a = setup(s); a.signIn(); a.route('practice');
+  const out = a.output();
+  assert.match(out, /class="hub"/);
+  assert.match(out, /class="hub-now"/);
+  assert.match(out, /class="hub-chip"/);
+  assert.match(out, /class="practice-track"/);
+  const track = out.match(/<ol class="practice-track"[\s\S]*?<\/ol>/)[0];
+  const labels = [...track.matchAll(/<small>([^<]+)<\/small>/g)].map(m => m[1]);
+  assert.deepEqual(labels, ['درس فعلی', 'تمرین تایپی', 'تمرین صوتی', 'تمرین در موقعیت', 'مرور']);
+  assert.match(out, /class="hub-review"/);
+  assert.match(out, /class="hub-review-list"/);
+  assert.match(out, /class="hub-topic-list"/);
+  assert.doesNotMatch(out, /buddy|mascot|hero-character/);
+  assert.equal([...out.matchAll(/class="app-card"/g)].length, 0);
+});
+
+test('practice hub marks the running session step and offers a single clear call to action', () => {
+  const s = C.initial(); C.start(s, 0, 'cafe'); s.session.step = 'practice';
+  const a = setup(s); a.signIn(); a.route('practice');
+  const out = a.output();
+  const track = out.match(/<ol class="practice-track"[\s\S]*?<\/ol>/)[0];
+  assert.equal([...track.matchAll(/is-now/g)].length, 1);
+  assert.equal([...track.matchAll(/is-done/g)].length, 2);
+  assert.match(out, /پایان و دیدن بازخورد/);
+  assert.match(out, /What would you like to drink\?/);
 });
 
 test('no mascot or character art remains anywhere in the product or landing markup', () => {
